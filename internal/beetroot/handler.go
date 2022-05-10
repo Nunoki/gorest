@@ -69,7 +69,7 @@ func (h Handler) HandleRead(c *gin.Context) {
 	c.JSON(
 		http.StatusOK,
 		Response{
-			Payload: blob,
+			Payload: string(blob),
 			Meta: ResponseMeta{
 				ModifiedAt: modifiedAt,
 			},
