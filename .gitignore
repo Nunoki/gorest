@@ -1,0 +1,33 @@
+# Mac OS X files
+.DS_Store
+
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, build with `go test -c`, other test files
+*.test
+.test-coverage
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# Project-local glide cache, RE: https://github.com/Masterminds/glide/issues/736
+.glide/
+
+# Dependency directories
+# vendor/
+
+# SQLite databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Other
+tmp/
+build/
+.env
+.vscode

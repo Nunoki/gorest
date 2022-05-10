@@ -1,0 +1,51 @@
+version: '3.4'
+
+services:
+  app:
+    build:
+      context: ./.docker/app
+    ports:
+      - 3010:80
+    volumes:
+      - .:/go/src/app
+    working_dir: /go/src/app
+    command: sh -c air
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      POSTGRES_PASSWORD: dev
+      POSTGRES_USER: dev
+      POSTGRES_DB: dev
+      MACHINE_USER_TOKEN: ${MACHINE_USER_TOKEN}
+      JWT_PUBLIC_KEY: ${JWT_PUBLIC_KEY}
+      PAYLOAD_BYTE_LIMIT: ${PAYLOAD_BYTE_LIMIT}
+      air_wd: /go/src/app
+  cli:
+    image: golang:1.17 # -alpine image doesn't have git
+    volumes:
+      - .:/go/src/app
+    working_dir: /go/src/app
+    command: sh -c "go run ./cmd/migrate/main.go && tail -F nonexistent" # migrate and keep running
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      POSTGRES_PASSWORD: dev
+      POSTGRES_USER: dev
+      POSTGRES_DB: dev
+      MACHINE_USER_TOKEN: ${MACHINE_USER_TOKEN}
+  postgres:
+    ports:
+      - 5435:5432
+    image: postgres:13.4-alpine
+    environment:
+      POSTGRES_PASSWORD: dev
+      POSTGRES_USER: dev
+      POSTGRES_DB: dev
+    healthcheck:
+      # TODO: can we get rid of the constant pings?
+      test: ["CMD-SHELL", "pg_isready -U dev"]
+      timeout: 1s
+      interval: 5s
+      retries: 5
