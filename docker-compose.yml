@@ -7,7 +7,7 @@ services:
     ports:
       - 3010:80
     volumes:
-      - .:/go/src/app
+      - .:/go/src/app:z
     working_dir: /go/src/app
     command: sh -c air
     depends_on:
@@ -16,6 +16,7 @@ services:
     environment:
       POSTGRES_PASSWORD: dev
       POSTGRES_USER: dev
+      POSTGRES_HOST: postgres
       POSTGRES_DB: dev
       MACHINE_USER_TOKEN: ${MACHINE_USER_TOKEN}
       JWT_PUBLIC_KEY: ${JWT_PUBLIC_KEY}
@@ -24,7 +25,7 @@ services:
   cli:
     image: golang:1.17 # -alpine image doesn't have git
     volumes:
-      - .:/go/src/app
+      - .:/go/src/app:z
     working_dir: /go/src/app
     command: sh -c "go run ./cmd/migrate/main.go && tail -F nonexistent" # migrate and keep running
     depends_on:
@@ -33,6 +34,7 @@ services:
     environment:
       POSTGRES_PASSWORD: dev
       POSTGRES_USER: dev
+      POSTGRES_HOST: postgres
       POSTGRES_DB: dev
       MACHINE_USER_TOKEN: ${MACHINE_USER_TOKEN}
   postgres:
