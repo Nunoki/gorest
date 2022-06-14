@@ -9,6 +9,7 @@ import (
 )
 
 const defaultPostgresPort = "5432"
+const defaultPostgresHost = "localhost"
 
 type Client struct {
 	conn *pgxpool.Pool
@@ -46,8 +47,12 @@ func ConnectionStringFromEnv() string {
 		port = defaultPostgresPort
 	}
 
+	if len(host) == 0 {
+		host = defaultPostgresHost
+	}
+
 	if len(u) == 0 || len(pw) == 0 || len(db) == 0 {
-		panic("missing required parameter for database connection, required: USER, PASSWORD, DB, optional: PORT")
+		panic("missing required parameter for database connection, required: POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB, optional: POSTGRES_HOST, POSTGRES_PORT")
 	}
 
 	return ConnectionString(u, pw, db, host, port)
