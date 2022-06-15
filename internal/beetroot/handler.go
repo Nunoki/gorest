@@ -16,10 +16,10 @@ type Handler struct {
 	Repo Repository
 }
 
-type Request interface{}
+type Request interface{} // DEPRECATED
 
 type ResponseMeta struct {
-	ModifiedAt time.Time `json:"modifiedAt"`
+	ModifiedAt time.Time `json:"modifiedAt"` // TODO: remove microseconds from JSON output
 }
 
 type Response struct {
