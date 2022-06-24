@@ -24,8 +24,3 @@ func TestGetPort(t *testing.T) {
 		t.Fatalf("expected %s, received %s", exp, port)
 	}
 }
-
-// REMOVE
-func TestFail(t *testing.T) {
-	t.Fatal("please fail")
-}
