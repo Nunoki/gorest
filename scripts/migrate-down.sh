@@ -8,5 +8,6 @@ if ! [[ $1 =~ $IS_NUM ]] ; then
     exit 1
 fi
 
+set -a
 source .env
-POSTGRES_PASSWORD=$POSTGRES_PASSWORD POSTGRES_USER=$POSTGRES_USER POSTGRES_HOST=$POSTGRES_HOST POSTGRES_PORT=$POSTGRES_PORT POSTGRES_DB=$POSTGRES_DB go run ./cmd/migrate/main.go --down=$1
+go run ./cmd/migrate/main.go --down=$1
