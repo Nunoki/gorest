@@ -1,6 +1,7 @@
 #!/bin/bash
-# Runs tests and generates test coverage results in the .test-coverage directory, then tells the
-# system to try to open them directly.
+HELPTEXT="Runs tests and generates test coverage results in the .test-coverage directory, then tells the system to try to open them directly."
+source $(dirname "$0")/_help_text.sh $@
+
 OUTPUT_FILE=./.test-coverage/test-coverage.html
 mkdir -p .test-coverage
 

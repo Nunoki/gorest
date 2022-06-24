@@ -1,8 +1,10 @@
 #!/bin/bash
-# Runs the down migrations. Requires a parameter defining how many steps it should roll back.
+HELPTEXT="Runs the down migrations. Requires a parameter defining how many steps it should migrate down."
+source $(dirname "$0")/_help_text.sh $@
+
 IS_NUM='^[0-9]+$'
 if ! [[ $1 =~ $IS_NUM ]] ; then
-    echo "Provide a number of migrations to roll back"
+    echo "Provide a number of migrations to migrate down"
     exit 1
 fi
 

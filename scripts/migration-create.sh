@@ -1,7 +1,6 @@
 #!/bin/bash
-# Creates templates for both up and down migration scripts, after prompting for a descriptive
-# name of the migration, then places them in the migration scripts directory with the appropriate
-# file name. The files will contain some commented sample code to get started.
+HELPTEXT="Creates templates for both up and down migration scripts, after prompting for a descriptive name of the migration, then places them in the migration scripts directory with the appropriate file name. The files will contain some commented sample code to get started."
+source $(dirname "$0")/_help_text.sh $@
 
 # declare directory
 dir=".docker/postgres"

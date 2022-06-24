@@ -1,5 +1,7 @@
 #!/bin/bash
-# Compiles the main app for all platforms into the build directory.
+HELPTEXT="Compiles the main app for all platforms into the build directory."
+source $(dirname "$0")/_help_text.sh $@
+
 echo 'Compiling into ./build'
 mkdir -p build
 for GOOS in darwin linux windows; do
