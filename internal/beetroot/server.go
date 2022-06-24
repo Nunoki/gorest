@@ -21,16 +21,25 @@ func NewServer(repo Repository) *Server {
 	s := Server{
 		router: gin.Default(),
 	}
-	publicKey := getJWTPublicKey()
-	s.router.Use(AuthMiddleware(publicKey))
 
+	// limit payload size to prevent large payload attack
 	limit := getPayloadSizeLimit()
 	s.router.Use(SizeLimitMiddleware(limit))
 
+	// create handler group, so that we can extract /ping as a public route
 	handler := NewHandler(repo)
-	s.router.GET("/", handler.HandleRead)
-	s.router.PUT("/", handler.HandleStore)
-	s.router.DELETE("/", handler.HandleDelete)
+	g := s.router.Group("")
+
+	// auth middleware before routes, order matters because it sets the user id in the context
+	publicKey := getJWTPublicKey()
+	g.Use(AuthMiddleware(publicKey))
+
+	// business logic goes here
+	g.GET("/", handler.HandleRead)
+	g.PUT("/", handler.HandleStore)
+	g.DELETE("/", handler.HandleDelete)
+
+	// ping pong
 	s.router.GET("/ping", func(c *gin.Context) {
 		c.String(
 			http.StatusOK,

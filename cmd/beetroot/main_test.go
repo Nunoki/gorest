@@ -6,6 +6,8 @@ import (
 )
 
 func TestGetPort(t *testing.T) {
+	os.Unsetenv("PORT")
+
 	port := getPort()
 	exp := "80"
 
@@ -21,4 +23,9 @@ func TestGetPort(t *testing.T) {
 	if port != exp {
 		t.Fatalf("expected %s, received %s", exp, port)
 	}
+}
+
+// REMOVE
+func TestFail(t *testing.T) {
+	t.Fatal("please fail")
 }

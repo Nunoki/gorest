@@ -1,6 +1,6 @@
 #!/bin/bash
 # Creates templates for both up and down migration scripts, after prompting for a descriptive
-# name of the migration, and places them in the migration scripts directory with the appropriate
+# name of the migration, then places them in the migration scripts directory with the appropriate
 # file name. The files will contain some commented sample code to get started.
 
 # declare directory
@@ -12,7 +12,7 @@ read name
 
 # prettify name
 name=${name// /_} # converts spaces to underscores
-name=$(echo $name | sed y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/) # converts to lowercase
+name=${name,,} # converts to lowercase
 
 # generate filenames
 now=$(date -u +%Y%m%d%H%M%S)

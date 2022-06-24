@@ -1,4 +1,5 @@
 #!/bin/bash
+# Compiles the main app for all platforms into the build directory.
 echo 'Compiling into ./build'
 mkdir -p build
 for GOOS in darwin linux windows; do

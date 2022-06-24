@@ -5,7 +5,7 @@ services:
     build:
       context: ./.docker/app
     ports:
-      - 3010:80
+      - 1337:${PORT}
     volumes:
       - .:/go/src/app:z
     working_dir: /go/src/app
@@ -14,10 +14,12 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      POSTGRES_PASSWORD: dev
-      POSTGRES_USER: dev
+      PORT: ${PORT}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_HOST: postgres
-      POSTGRES_DB: dev
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_PORT: 5432
       MACHINE_USER_TOKEN: ${MACHINE_USER_TOKEN}
       JWT_PUBLIC_KEY: ${JWT_PUBLIC_KEY}
       PAYLOAD_BYTE_LIMIT: ${PAYLOAD_BYTE_LIMIT}
@@ -39,12 +41,12 @@ services:
       MACHINE_USER_TOKEN: ${MACHINE_USER_TOKEN}
   postgres:
     ports:
-      - 5435:5432
+      - ${POSTGRES_PORT}:5432
     image: postgres:13.4-alpine
     environment:
-      POSTGRES_PASSWORD: dev
-      POSTGRES_USER: dev
-      POSTGRES_DB: dev
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_DB: ${POSTGRES_DB}
     healthcheck:
       # TODO: can we get rid of the constant pings?
       test: ["CMD-SHELL", "pg_isready -U dev"]

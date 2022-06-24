@@ -28,6 +28,7 @@ func main() {
 
 	s := beetroot.NewServer(pg)
 	port := getPort()
+	println("Listening on port " + port)
 	log.Fatal(http.ListenAndServe(":"+port, s))
 }
 

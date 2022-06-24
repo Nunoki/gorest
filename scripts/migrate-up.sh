@@ -1,5 +1,4 @@
 #!/bin/bash
-# Runs the up migrations through the docker container
-# NOTE: See `make migrate`
-
-docker-compose exec app go run ./cmd/migrate/main.go
+# Runs the up migrations
+source .env
+POSTGRES_PASSWORD=$POSTGRES_PASSWORD POSTGRES_USER=$POSTGRES_USER POSTGRES_HOST=$POSTGRES_HOST POSTGRES_PORT=$POSTGRES_PORT POSTGRES_DB=$POSTGRES_DB go run ./cmd/migrate/main.go
