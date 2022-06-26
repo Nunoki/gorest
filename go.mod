@@ -3,7 +3,6 @@ module github.com/nunoki/demo-go-microservice
 go 1.17
 
 require (
-	github.com/binogi/go-pkg v1.1.1
 	github.com/gin-gonic/gin v1.7.7
 	github.com/golang-jwt/jwt/v4 v4.3.0
 	github.com/golang-migrate/migrate/v4 v4.15.1
