@@ -1,8 +1,10 @@
 #!/bin/bash
-# Helper script that outputs the content of the $HELPTEXT variable if the (first) argument is either
-# `--help` or `-h`
-if [[ "$1" == "-h" ]] || [[ "$1" == "--help" ]]
+# Helper script that outputs the content of the $HELPTEXT variable if the --help argument is set
+if [[ $* == *--help\ * || $* == *--help ]]
 then
-	echo $HELPTEXT
+	HELPTEXT="${HELPTEXT//$'\n'/\\n}"
+	HELPTEXT="${HELPTEXT//$'\t'/\\t}"
+
+	echo -e $HELPTEXT
 	exit 0
 fi

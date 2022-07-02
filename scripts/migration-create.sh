@@ -1,5 +1,5 @@
 #!/bin/bash
-HELPTEXT="Creates templates for both up and down migration scripts, after prompting for a descriptive name of the migration, then places them in the migration scripts directory with the appropriate file name. The files will contain some commented sample code to get started."
+HELPTEXT="Create templates for both up and down migration scripts. It will prompt for a descriptive name of the migration, then place them in the migration scripts directory with the appropriate file name. The files will contain some commented sample code to get started."
 source $(dirname "$0")/_help_text.sh $@
 
 # declare directory
