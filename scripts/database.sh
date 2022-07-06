@@ -5,7 +5,7 @@ HELPTEXT="Start (unless --stop argument is provided) only the database container
 		Stop the container (assuming it is started)
 
 	--attach
-		Since the default behavior for this script will start the container in detached mode (with the -d to docker/podman), the --attach flag can be provided to omit the -d flag in order to start it in its default (attached) mode
+		Since the default behavior for this script will start the container in detached mode (with the -d flag to docker/podman), the --attach flag can be provided to omit the -d flag in order to start it in its default (attached) mode
 "
 source $(dirname "$0")/_help_text.sh $@
 
