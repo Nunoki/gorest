@@ -19,7 +19,7 @@ In this boilerplate state, the bearer token requires a value of `debug` (as demo
 
 > **Requirements:**
 > 
-> - Docker Engine 20.10 and Docker Compose 1.27 or later, or Podman equivalent
+> - Docker Engine 20.10+ and Docker Compose 1.27+, or Podman equivalent
 > - Set up values in the `.env` file using `.env.example` as template
 
 ## Option 1: To get the service up and running
@@ -49,7 +49,7 @@ Then, you can `source` the `.env` file and run the `go run` commands as usual. O
 
 # Sample curl commands to use the service
 
-> **Note**:  
+> **Note:**  
 > These commands assume you are running on port `1337` which is the default port set in `.env.example`. Otherwise, substitute the port number accordingly.
 
 To ping the service:
