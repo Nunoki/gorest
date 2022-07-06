@@ -4,7 +4,6 @@ go 1.17
 
 require (
 	github.com/gin-gonic/gin v1.7.7
-	github.com/golang-jwt/jwt/v4 v4.3.0
 	github.com/golang-migrate/migrate/v4 v4.15.1
 	github.com/jackc/pgx/v4 v4.15.0
 )
