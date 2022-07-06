@@ -11,7 +11,7 @@ func AuthMiddleware(pubkey string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// This is a debug/development behaviour in which a dummy user id is being set, and
 		// authentication is marked as successful without doing any work
-		c.Set("userID", "f44fe12d-8bec-4720-845e-dbebcc053f9f")
+		c.Set("userID", "00000000-0000-0000-0000-000000000000")
 		c.Next()
 
 		/*
