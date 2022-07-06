@@ -1,64 +1,73 @@
-# Demo Go service
+# GoREST
 
-In its current iteration, it is only a key-value storage, which saves JSON data into a database, corresponding to the user authenticated in the provided JWT token.
+![Gopher logo](gopher.png)
 
-# Authentication
+GoREST is a boilerplate REST API implemented in Go. It implements:
 
-A JWT bearer token is required, which can be issued through [redacted]
+- Sample JSON endpoints
+- Postgres database client
+- Authentication middleware (+sample JWT code)
+- Large payload protection middleware
+- Dockerization (+database migration)
+- Tests
 
-## Authentication for testing purposes
+It exposes 4 total endpoints, 3 of which are behind authentication middleware, 1 is public. The 1 public endpoint is a `/ping` endpoint, which only returns a `"pong"` in plain text. The other 3 are `GET`, `PUT` and `DELETE` endpoints for manipulating JSON-formatted data, which will be stored in the database corresponding to whatever user ID the authentication middleware resolves. 
 
-For testing only, a bearer token with the value of `debug` can be used. The header value looks like:
-
-    Authorization: Bearer debug
+In this boilerplate state, the bearer token requires a value of `debug` (as demonstrated in [Sample curl commands to use the service](#sample-curl-commands-to-use-the-service)), and the resolved user ID will be `00000000-0000-0000-0000-000000000000` (valid UUIDv4 format required by the user table).
 
 # How to run
 
-**Requirements:**
+> **Requirements:**
+> 
+> - Docker Engine 20.10 and Docker Compose 1.27 or later, or Podman equivalent
+> - Set up values in the `.env` file using `.env.example` as template
 
-- Docker Engine 20.10 and Docker Compose 1.27 or later: https://www.docker.com/products/docker-desktop
-- Set up values in the `.env` file (use `.env.example` as a template):
-  - Valid public key from [redacted]
-  - Valid Personal Access Token with privileges to read `go-pkg` (not required if vendored)
-
-Run the following commands to get the service up and running:
+## Option 1: To get the service up and running
 
     docker-compose up -d
 
-# `go get` and other `go` commands in Docker
+## Option2: For local development
 
-To use the `go` commands, use the `go.sh` script. 
+For development, you can only get the database container up, and then use your local `go` environment.
 
-For example, for a `go get github.com/gin-gonic/gin`, the command would look like this:
+To get the database container up, you can use the following convenience script:
 
-    ./scripts/go.sh get github.com/gin-gonic/gin
+    ./scripts/database.sh
 
-And for a `go mod tidy`, it would look like this:
+It is equivalent to doing `docker-compose up postgres -d`, with environment variables passed.
 
-    ./scripts/go.sh mod tidy
+Then, if this is the first time you created the database container, run the necessary migrations. You can use the following convenience script:
 
-# Sample Curl commands to use the service
+    ./scripts/migrate.sh
 
-To use these commands, we will use the testing `debug` bearer token, but if you have a real token, feel free to substitute it in the command.
+It is equivalent to doing `go run ./cmd/migrate/main.go`, with environment variables passed.
+
+Then, you can `source` the `.env` file and run the `go run` commands as usual. Or, use one of the following convenience scripts:
+
+1. `./scripts/service-start.sh` — equivalent of doing `go build ./cmd/gorest/main.go` with environment variables passed
+2. `./scripts/air.sh` — equivalent of running [air](http://github.com/cosmtrek/air) with environment variables passed
+
+# Sample curl commands to use the service
+
+> **Note**:  
+> These commands assume you are running on port `1337` which is the default port set in `.env.example`. Otherwise, substitute the port number accordingly.
 
 To ping the service:
 
-    curl -i -H "Authorization: Bearer debug" localhost:3010/ping
+    curl -i localhost:1337/ping
 
-To store a sample data of `123`:
+To store a sample data of `123` (stored data can be any valid JSON):
 
-    curl -i -H "Authorization: Bearer debug" -X PUT -d "123" localhost:3010
+    curl -i -H "Authorization: Bearer debug" -X PUT -d "123" localhost:1337
 
 To retreive previously stored data:
 
-    curl -i -H "Authorization: Bearer debug" localhost:3010
+    curl -i -H "Authorization: Bearer debug" localhost:1337
 
-To delete previously stored data:
+To delete any stored data:
 
-    curl -i -H "Authorization: Bearer debug" -X DELETE localhost:3010
+    curl -i -H "Authorization: Bearer debug" -X DELETE localhost:1337
 
-# Other commands
+# Other
 
-For other helpful commands for running, building, or tests, check out the scripts by doing `ls ./scripts`. Some of those (which don't require user input) are runnable through the `make` command as well, for convenience, so check out `make help` for a list.
-
-Hint: For running subcommands of the `go` command (for example `go mod tidy`), use `./scripts/go.sh mod tidy`.
+For other helpful scripts, check out the scripts by doing `ls ./scripts`. Every script accepts a `--help` flag to briefly clarify what it does and whether it accepts additional flags to control behavior.
