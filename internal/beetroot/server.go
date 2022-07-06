@@ -55,6 +55,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.router.ServeHTTP(w, r)
 }
 
+// TODO: move this and getPayloadSizeLimit() into main instead
 // getJWTPublicKey returns the public key for verifying JWT's from Lettuce, which in its current
 // iteration is passed via an environment variable
 func getJWTPublicKey() string {

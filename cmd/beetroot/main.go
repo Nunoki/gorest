@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -16,8 +15,6 @@ var (
 )
 
 func main() {
-	fmt.Println("Hello world")
-
 	// connect to database
 	connStr := postgres.ConnectionStringFromEnv()
 	pg, err := postgres.NewClient(ctx, connStr)

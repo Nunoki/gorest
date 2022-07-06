@@ -3,15 +3,9 @@ package beetroot
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
-	"net/http"
-	"net/http/httptest"
 	"os"
-	"strings"
 	"testing"
-
-	"github.com/gin-gonic/gin"
 )
 
 type MyWriter struct {
@@ -32,7 +26,8 @@ func TestGinEngineAttached(t *testing.T) {
 	}
 }
 
-func TestAuthMiddlewareAttached(t *testing.T) {
+/*
+func TestJWTAuthMiddlewareAttached(t *testing.T) {
 	log.SetOutput(ioutil.Discard)
 	repo := RepositoryMock{}
 	gin.SetMode(gin.TestMode)
@@ -70,6 +65,7 @@ func TestGetJWTPublicKey(t *testing.T) {
 		t.Fatal("Warning should have been logged about missing public key declaration")
 	}
 }
+*/
 
 func TestGetPayloadSizeLimit(t *testing.T) {
 	log.SetOutput(io.Discard)

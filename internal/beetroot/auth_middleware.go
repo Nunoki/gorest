@@ -9,7 +9,8 @@ import (
 // code will be output, and execution terminated
 func AuthMiddleware(pubkey string) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// DOCME
+		// This is a debug/development behaviour in which a dummy user id is being set, and
+		// authentication is marked as successful without doing any work
 		c.Set("userID", "f44fe12d-8bec-4720-845e-dbebcc053f9f")
 		c.Next()
 
@@ -26,11 +27,8 @@ func AuthMiddleware(pubkey string) gin.HandlerFunc {
 	}
 }
 
-// JWTAuth will call the Lettuce JWT verifier in order to confirm that the requester is an
-// authenticated user as identified by Lettuce. It will then set an app variable containing the
-// Subject from the JWT as `userID` and call the next handler. If authorization fails, the request
-// is aborted with 401 and no handlers are being called.
-// It will use the public key pubkey for token verification
+// JWTAuth will authenticate user based on the JWT in the authorization header
+// TODO: Replace lettucejwt with generic JWT authentication
 func JWTAuth(c *gin.Context, pubkey string) error {
 	return nil // TODO
 	/*
