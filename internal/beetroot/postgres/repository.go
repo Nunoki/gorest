@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v4"
-	"github.com/nunoki/demo-go-microservice/internal/beetroot"
+	"github.com/nunoki/gorest/internal/beetroot"
 )
 
 const queryFind = `

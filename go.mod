@@ -1,4 +1,4 @@
-module github.com/nunoki/demo-go-microservice
+module github.com/nunoki/gorest
 
 go 1.17
 
