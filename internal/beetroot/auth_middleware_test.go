@@ -2,6 +2,7 @@ package beetroot
 
 // TODO: update these tests to create own server with attached middleware, since the app doesn't
 // necessarily have to use the JWT auth middleware
+// TODO: Test dummyAuth()
 /*
 func TestValidJWT(t *testing.T) {
 	log.SetOutput(ioutil.Discard) // REMOVE
