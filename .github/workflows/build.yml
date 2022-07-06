@@ -29,7 +29,7 @@ jobs:
         run: go build -v ./...
 
       - name: Bring up database
-        run: docker-compose up postgres -d
+        run: docker-compose up postgres
         env:
           APP_PORT: 1337
           PAYLOAD_BYTE_LIMIT: 5000
