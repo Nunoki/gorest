@@ -2,9 +2,9 @@ name: deploy
 
 on:
   push:
-    branches: [master, uat, qa, workflow-test]
+    branches: [master, beta, live, workflow-test]
 
-  # Allows you to run this workflow manually from the Actions tab
+  # Allows running this workflow manually from the Actions tab
   workflow_dispatch:
 
 jobs:
@@ -13,5 +13,14 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Run tests
+      - name: Run integration tests
         run: docker-compose run app go test ./...
+        env:
+          APP_PORT: 1337
+          PAYLOAD_BYTE_LIMIT: 5000
+
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5435
+          POSTGRES_USER: dev
+          POSTGRES_PASSWORD: dev
+          POSTGRES_DB: dev
