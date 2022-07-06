@@ -21,6 +21,7 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       PAYLOAD_BYTE_LIMIT: ${PAYLOAD_BYTE_LIMIT}
   postgres:
+    # TODO: Can we specify UTC timezone for postgres?
     ports:
       - ${POSTGRES_PORT}:5432
     image: postgres:13.4-alpine
