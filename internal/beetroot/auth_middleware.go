@@ -1,29 +1,43 @@
 package beetroot
 
 import (
-	"log"
-	"net/http"
-	"time"
-
-	"github.com/binogi/go-pkg/lettucejwt"
-
 	"github.com/gin-gonic/gin"
 )
 
-// AuthMiddleware will call the Lettuce JWT verifier in order to confirm that the requester is an
-// authenticated user as identified by Lettuce. It will then set an app variable containing the
-// Subject from the JWT as `userID` and call the next handler. If authorization fails, the request
-// is aborted with 401 and no handlers are being called.
-// It will use the public key pubkey for token verification
+// AuthMiddleware will call the appropriate authorization method, and then call the subsequent
+// handler call if the authorization was successful. If it wasn't, a StatusUnauthorized status
+// code will be output, and execution terminated
 func AuthMiddleware(pubkey string) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		// This is a debug/development behaviour in which a dummy user id is being set, and
+		// authentication is marked as successful without doing any work
+		c.Set("userID", "f44fe12d-8bec-4720-845e-dbebcc053f9f")
+		c.Next()
+
+		/*
+			if err := JWTAuth(c, pubkey); err != nil {
+				c.AbortWithStatusJSON(
+					http.StatusUnauthorized,
+					err.Error(),
+				)
+				return
+			}
+			c.Next()
+		*/
+	}
+}
+
+// JWTAuth will authenticate user based on the JWT in the authorization header
+// TODO: Replace lettucejwt with generic JWT authentication
+func JWTAuth(c *gin.Context, pubkey string) error {
+	return nil // TODO
+	/*
 		jwt := c.GetHeader("authorization")
 
 		// REMOVE (used to make testing easier, because expired tokens are rejected)
 		if jwt == "Bearer debug" {
 			c.Set("userID", "f44fe12d-8bec-4720-845e-dbebcc053f9f")
-			c.Next()
-			return
+			return nil
 		}
 
 		// TODO: Should lettucejwt.Read() do this part on its own?
@@ -34,14 +48,10 @@ func AuthMiddleware(pubkey string) gin.HandlerFunc {
 		claims, err := lettucejwt.Read(jwt, pubkey)
 
 		if err != nil {
-			c.AbortWithStatusJSON(
-				http.StatusUnauthorized,
-				err.Error(),
-			)
-			return
+			return err
 		}
 
-		// TODO: remove
+		// REMOVE debug
 		expiration := time.Unix(claims.ExpiresAt, 0).UTC()
 		log.Printf(
 			"sub: %s, iat: %d, exp: %d, iss: %s, expires at %s\n",
@@ -53,6 +63,7 @@ func AuthMiddleware(pubkey string) gin.HandlerFunc {
 		)
 
 		c.Set("userID", claims.Subject)
-		c.Next()
-	}
+
+		return nil
+	*/
 }

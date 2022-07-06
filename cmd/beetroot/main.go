@@ -28,13 +28,14 @@ func main() {
 
 	s := beetroot.NewServer(pg)
 	port := getPort()
+	println("Listening on port " + port)
 	log.Fatal(http.ListenAndServe(":"+port, s))
 }
 
 // getPort returns the port number that the app is specified to run on. It will try to read from
 // the environment, or return "80" by default.
 func getPort() string {
-	port := os.Getenv("PORT")
+	port := os.Getenv("APP_PORT")
 	if len(port) == 0 {
 		port = "80"
 	}

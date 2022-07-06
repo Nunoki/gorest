@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 	"os"
 
@@ -26,7 +27,7 @@ func NewClient(ctx context.Context, connStr string) (*Client, error) {
 	}, nil
 }
 
-// DOCME
+// Close calls .Close() on the underlying pgxpool.Pool instance
 func (c *Client) Close() {
 	if c == nil || c.conn == nil {
 		return
@@ -58,11 +59,20 @@ func ConnectionStringFromEnv() string {
 	return ConnectionString(u, pw, db, host, port)
 }
 
+// ConnectionString returns the postgres connection string with parameters defined in the
+// call arguments
 func ConnectionString(username, password, db, host, port string) string {
 	username = url.QueryEscape(username)
 	password = url.QueryEscape(password)
 	db = url.QueryEscape(db)
 	port = url.QueryEscape(port)
 
-	return "postgres://" + username + ":" + password + "@" + host + ":" + port + "/" + db + "?sslmode=disable"
+	return fmt.Sprintf(
+		"postgres://%s:%s@%s:%s/%s?sslmode=disable",
+		username,
+		password,
+		host,
+		port,
+		db,
+	)
 }

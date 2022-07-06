@@ -1,6 +1,14 @@
-# build an image of golang with air; which watches for
-# file changes, and the re-compiles and re-runs the app.
-# we are using vanilla golang, because the alpine version
-# of golang doesn't have git installed
-FROM golang:1.17
-RUN go install github.com/cosmtrek/air@latest
+FROM golang:1.18-alpine
+
+WORKDIR /usr/src/app
+
+# pre-copy/cache go.mod for pre-downloading dependencies and only redownloading them in subsequent
+# builds if they change
+COPY go.mod go.sum ./
+RUN go mod download && go mod verify
+
+COPY . .
+RUN go build -v -o /usr/local/bin/ ./...
+
+CMD ["migrate"]
+CMD ["beetroot"]

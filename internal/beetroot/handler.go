@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/binogi/go-pkg/response"
 	"github.com/gin-gonic/gin"
 )
 
@@ -25,6 +24,10 @@ type ResponseMeta struct {
 type Response struct {
 	Payload interface{}  `json:"payload"`
 	Meta    ResponseMeta `json:"meta"`
+}
+
+type RespError struct {
+	Message string `json:"message"`
 }
 
 // New returns a new instance of the Handler with the repo as the user repository
@@ -140,7 +143,7 @@ func (h Handler) HandleDelete(c *gin.Context) {
 	if err != nil {
 		c.AbortWithStatusJSON(
 			http.StatusInternalServerError,
-			response.Error{
+			RespError{
 				Message: err.Error(),
 			},
 		)

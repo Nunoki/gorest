@@ -6,6 +6,8 @@ import (
 )
 
 func TestGetPort(t *testing.T) {
+	os.Unsetenv("APP_PORT")
+
 	port := getPort()
 	exp := "80"
 
@@ -13,7 +15,7 @@ func TestGetPort(t *testing.T) {
 		t.Fatalf("expected %s, received %s", exp, port)
 	}
 
-	os.Setenv("PORT", "69")
+	os.Setenv("APP_PORT", "69")
 
 	exp = "69"
 	port = getPort()
