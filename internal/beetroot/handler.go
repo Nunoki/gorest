@@ -17,17 +17,26 @@ type Handler struct {
 
 type Request interface{} // DEPRECATED
 
-type ResponseMeta struct {
-	ModifiedAt time.Time `json:"modifiedAt"` // TODO: remove microseconds from JSON output
-}
-
 type Response struct {
 	Payload interface{}  `json:"payload"`
 	Meta    ResponseMeta `json:"meta"`
 }
 
+type ResponseMeta struct {
+	ModifiedAt customTime `json:"modifiedAt"`
+}
+
 type RespError struct {
 	Message string `json:"message"`
+}
+
+type customTime struct {
+	time.Time
+}
+
+// MarshalJSON marshals the time into the standard Atom time format
+func (t customTime) MarshalJSON() ([]byte, error) {
+	return []byte(t.Time.UTC().Format("\"2006-01-02T15:04:05Z\"")), nil
 }
 
 // New returns a new instance of the Handler with the repo as the user repository
@@ -74,7 +83,7 @@ func (h Handler) HandleRead(c *gin.Context) {
 		Response{
 			Payload: string(blob),
 			Meta: ResponseMeta{
-				ModifiedAt: modifiedAt,
+				ModifiedAt: customTime{Time: modifiedAt},
 			},
 		},
 	)
