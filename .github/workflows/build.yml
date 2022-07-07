@@ -36,8 +36,17 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Test postgres
-        run: docker-compose exec postgres sh -c "postgres --version" 2> /dev/null
+      # - name: Test postgres
+      #   run: docker-compose exec postgres sh -c "postgres --version" 2> /dev/null
+
+      - name: Which docker
+        run: which docker
+
+      - name: Which docker-compose
+        run: which docker-compose
+
+      - name: docker ps
+        run: docker ps
 
       - name: Docker inspect
         run: docker inspect $(docker-inspect ps -q 2> /dev/null)
