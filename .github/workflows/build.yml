@@ -37,10 +37,10 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
-          go-version: 1.18
+          go-version-file: ./go.mod
 
       - name: Build essential for Ubuntu
-        run: apt-get install build-essential
+        run: apt update && apt install build-essential
 
       - name: Go build
         run: go build -v ./...
