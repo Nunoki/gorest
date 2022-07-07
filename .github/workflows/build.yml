@@ -6,18 +6,19 @@ on:
   pull_request:
     branches: [master]
 
-  # Allows running this workflow manually from the Actions tab
+  # allows running this workflow manually from the Actions tab
   workflow_dispatch:
 
 env:
-  APP_PORT: 1337
-  PAYLOAD_BYTE_LIMIT: 5000
-
   POSTGRES_HOST: postgres
   POSTGRES_PORT: 5432
   POSTGRES_USER: dev
   POSTGRES_PASSWORD: dev
   POSTGRES_DB: dev
+
+  # irrelevant but required
+  APP_PORT: 1337
+  PAYLOAD_BYTE_LIMIT: 5000
 
 jobs:
   build:
@@ -39,6 +40,7 @@ jobs:
         with:
           go-version-file: ./go.mod
 
+      # installs gcc needed by some go packages
       - name: Build essential for Ubuntu
         run: apt update && apt install -y build-essential
 
