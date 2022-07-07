@@ -9,6 +9,16 @@ on:
   # Allows running this workflow manually from the Actions tab
   workflow_dispatch:
 
+env:
+  APP_PORT: 1337
+  PAYLOAD_BYTE_LIMIT: 5000
+
+  POSTGRES_HOST: localhost
+  POSTGRES_PORT: 5432
+  POSTGRES_USER: dev
+  POSTGRES_PASSWORD: dev
+  POSTGRES_DB: dev
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -42,12 +52,3 @@ jobs:
 
       - name: Run integration tests
         run: go test -tags=integration ./...
-        env:
-          APP_PORT: 1337
-          PAYLOAD_BYTE_LIMIT: 5000
-
-          POSTGRES_HOST: localhost
-          POSTGRES_PORT: 5432
-          POSTGRES_USER: dev
-          POSTGRES_PASSWORD: dev
-          POSTGRES_DB: dev
