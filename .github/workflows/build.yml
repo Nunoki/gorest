@@ -25,5 +25,5 @@ jobs:
     - name: Verify Postgres connection from container 
       run: |
         apt-get update
-        apt-get install -y psql
+        apt-get install -y postgresql postgresql-contrib
         echo "\l" | psql -U dev
