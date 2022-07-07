@@ -40,7 +40,7 @@ jobs:
           go-version-file: ./go.mod
 
       - name: Build essential for Ubuntu
-        run: apt update && apt install build-essential
+        run: apt update && apt install -y build-essential
 
       - name: Go build
         run: go build -v ./...
