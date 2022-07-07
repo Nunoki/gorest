@@ -39,7 +39,10 @@ jobs:
         with:
           go-version: 1.18
 
-      - name: Build
+      - name: Build essential for Ubuntu
+        run: apt-get install build-essential
+
+      - name: Go build
         run: go build -v ./...
 
       - name: Run migrations
