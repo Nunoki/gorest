@@ -27,7 +27,7 @@ else
 	ARG_D="-d"
 fi
 
-COMMAND="$CMD_DOCKER $ARG postgres $ARG_D"
+COMMAND="$CMD_DOCKER $ARG $ARG_D postgres"
 echo $COMMAND
 $COMMAND 2> /dev/null
 echo "Done."
