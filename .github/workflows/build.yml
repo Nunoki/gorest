@@ -15,13 +15,15 @@ jobs:
     container: ubuntu
     services:
       mydb:
-        image: mysql:5.7
+        image: postgres:13.4-alpine #database_image
         env:
-          MYSQL_ROOT_PASSWORD: password
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=5
+          POSTGRES_PASSWORD: dev
+          POSTGRES_USER: dev
+          POSTGRES_DB: dev
+        options: --health-cmd="pg_isready" --health-interval=10s --health-timeout=5s --health-retries=5
     steps:
-    - name: Verify MySQL connection from container 
+    - name: Verify Postgres connection from container 
       run: |
         apt-get update
-        apt-get install -y mysql-client
-        mysql --host mydb -uroot -ppassword -e "SHOW DATABASES"
+        apt-get install -y psql
+        echo "\l" | psql -U dev
