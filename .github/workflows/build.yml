@@ -9,13 +9,14 @@ on:
   # Allows running this workflow manually from the Actions tab
   workflow_dispatch:
 
-APP_PORT: 1337
-PAYLOAD_BYTE_LIMIT: 5000
-POSTGRES_HOST: postgres
-POSTGRES_PORT: 5432
-POSTGRES_PASSWORD: dev
-POSTGRES_USER: dev
-POSTGRES_DB: dev
+env:
+  APP_PORT: 1337
+  PAYLOAD_BYTE_LIMIT: 5000
+  POSTGRES_HOST: postgres
+  POSTGRES_PORT: 5432
+  POSTGRES_PASSWORD: dev
+  POSTGRES_USER: dev
+  POSTGRES_DB: dev
 
 jobs:
   test-container:
