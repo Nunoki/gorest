@@ -2,16 +2,53 @@ name: deploy
 
 on:
   push:
-    branches: [master, uat, qa, workflow-test]
+    branches: [master, beta, live, workflow-test]
+  pull_request:
+    branches: [master]
 
-  # Allows you to run this workflow manually from the Actions tab
+  # allows running this workflow manually from the Actions tab
   workflow_dispatch:
+
+env:
+  POSTGRES_HOST: postgres
+  POSTGRES_PORT: 5432
+  POSTGRES_USER: dev
+  POSTGRES_PASSWORD: dev
+  POSTGRES_DB: dev
+
+  # irrelevant but required
+  APP_PORT: 1337
+  PAYLOAD_BYTE_LIMIT: 5000
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    container: ubuntu
+    services:
+      postgres:
+        image: postgres:13.4-alpine #database_image
+        env:
+          POSTGRES_PASSWORD: dev
+          POSTGRES_USER: dev
+          POSTGRES_DB: dev
+        options: --health-cmd="pg_isready" --health-interval=5s --health-timeout=1s --health-retries=5
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
-      - name: Run tests
-        run: docker-compose run app go test ./...
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version-file: ./go.mod
+
+      # installs gcc needed by some go packages
+      - name: Build essential for Ubuntu
+        run: apt update && apt install -y build-essential
+
+      - name: Go build
+        run: go build -v ./...
+
+      - name: Run migrations
+        run: go run ./cmd/migrate/main.go
+
+      - name: Run integration tests
+        run: go test -tags=integration ./...
