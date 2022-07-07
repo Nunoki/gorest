@@ -9,12 +9,20 @@ on:
   # Allows running this workflow manually from the Actions tab
   workflow_dispatch:
 
+APP_PORT: 1337
+PAYLOAD_BYTE_LIMIT: 5000
+POSTGRES_HOST: postgres
+POSTGRES_PORT: 5432
+POSTGRES_PASSWORD: dev
+POSTGRES_USER: dev
+POSTGRES_DB: dev
+
 jobs:
   test-container:
     runs-on: ubuntu-latest
     container: ubuntu
     services:
-      mydb:
+      postgres:
         image: postgres:13.4-alpine #database_image
         env:
           POSTGRES_PASSWORD: dev
@@ -22,8 +30,18 @@ jobs:
           POSTGRES_DB: dev
         options: --health-cmd="pg_isready" --health-interval=10s --health-timeout=5s --health-retries=5
     steps:
-    - name: Verify Postgres connection from container 
-      run: |
-        apt-get update
-        apt-get install -y postgresql postgresql-contrib
-        echo "\l" | psql -U dev
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.18
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.18
+
+      - name: Build
+        run: go build -v ./...
+
+      - name: Run migrations
+        run: go run ./cmd/migrate/main.go
