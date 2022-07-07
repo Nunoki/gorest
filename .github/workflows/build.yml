@@ -9,63 +9,19 @@ on:
   # Allows running this workflow manually from the Actions tab
   workflow_dispatch:
 
-env:
-  APP_PORT: 1337
-  PAYLOAD_BYTE_LIMIT: 5000
-
-  POSTGRES_HOST: localhost
-  POSTGRES_PORT: 5435
-  POSTGRES_USER: dev
-  POSTGRES_PASSWORD: dev
-  POSTGRES_DB: dev
-
 jobs:
-  build:
+  test-container:
     runs-on: ubuntu-latest
     container: ubuntu
     services:
-      postgres:
-        image: postgres:13.4-alpine #database_image
+      mydb:
+        image: mysql:5.7
         env:
-          POSTGRES_PASSWORD: dev
-          POSTGRES_USER: dev
-          POSTGRES_DB: dev
-        ports:
-          - 5435:5432
-        options: --health-cmd="pg_isready" --health-interval=5s --health-timeout=1s --health-retries=5
+          MYSQL_ROOT_PASSWORD: password
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=5
     steps:
-      - uses: actions/checkout@v3
-
-      # - name: Test postgres
-      #   run: docker-compose exec postgres sh -c "postgres --version" 2> /dev/null
-
-      - name: Which docker
-        run: which docker
-
-      - name: Which docker-compose
-        run: which docker-compose
-
-      - name: docker ps
-        run: docker ps
-
-      - name: Docker inspect
-        run: docker inspect $(docker-inspect ps -q 2> /dev/null)
-
-      # - name: Set up Go
-      #   uses: actions/setup-go@v3
-      #   with:
-      #     go-version: 1.18
-
-      # - name: Set up Go
-      #   uses: actions/setup-go@v3
-      #   with:
-      #     go-version: 1.18
-
-      # - name: Build
-      #   run: go build -v ./...
-
-      # - name: Run migrations
-      #   run: go run ./cmd/migrate/main.go
-
-      # - name: Run integration tests
-      #   run: go test -tags=integration ./...
+    - name: Verify MySQL connection from container 
+      run: |
+        apt-get update
+        apt-get install -y mysql-client
+        mysql --host mydb -uroot -ppassword -e "SHOW DATABASES"
