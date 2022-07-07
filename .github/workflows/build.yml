@@ -14,7 +14,7 @@ env:
   PAYLOAD_BYTE_LIMIT: 5000
 
   POSTGRES_HOST: localhost
-  POSTGRES_PORT: 5432
+  POSTGRES_PORT: 5435
   POSTGRES_USER: dev
   POSTGRES_PASSWORD: dev
   POSTGRES_DB: dev
@@ -30,6 +30,8 @@ jobs:
           POSTGRES_PASSWORD: dev
           POSTGRES_USER: dev
           POSTGRES_DB: dev
+        ports:
+          - 5435:5432
         options: --health-cmd="pg_isready" --health-interval=5s --health-timeout=1s --health-retries=5
     steps:
       - uses: actions/checkout@v3
