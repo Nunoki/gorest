@@ -12,6 +12,15 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    container: ubuntu
+    services:
+      postgres:
+        image: postgres:13.4-alpine #database_image
+        env:
+          POSTGRES_PASSWORD: dev
+          POSTGRES_USER: dev
+          POSTGRES_DB: dev
+        options: --health-cmd="pg_isready" --health-interval=5s --health-timeout=1s --health-retries=5
     steps:
       - uses: actions/checkout@v3
 
@@ -28,14 +37,17 @@ jobs:
       - name: Build
         run: go build -v ./...
 
+      - name: Run migrations
+        run: go run ./cmd/migrate/main.go
+
       - name: Run integration tests
-        run: docker-compose run app go test -tags=integration ./...
+        run: go test -tags=integration ./...
         env:
           APP_PORT: 1337
           PAYLOAD_BYTE_LIMIT: 5000
 
           POSTGRES_HOST: localhost
-          POSTGRES_PORT: 5435
+          POSTGRES_PORT: 5432
           POSTGRES_USER: dev
           POSTGRES_PASSWORD: dev
           POSTGRES_DB: dev
