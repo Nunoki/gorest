@@ -12,14 +12,15 @@ on:
 env:
   APP_PORT: 1337
   PAYLOAD_BYTE_LIMIT: 5000
+
   POSTGRES_HOST: postgres
   POSTGRES_PORT: 5432
-  POSTGRES_PASSWORD: dev
   POSTGRES_USER: dev
+  POSTGRES_PASSWORD: dev
   POSTGRES_DB: dev
 
 jobs:
-  test-container:
+  build:
     runs-on: ubuntu-latest
     container: ubuntu
     services:
@@ -29,8 +30,10 @@ jobs:
           POSTGRES_PASSWORD: dev
           POSTGRES_USER: dev
           POSTGRES_DB: dev
-        options: --health-cmd="pg_isready" --health-interval=10s --health-timeout=5s --health-retries=5
+        options: --health-cmd="pg_isready" --health-interval=5s --health-timeout=1s --health-retries=5
     steps:
+      - uses: actions/checkout@v3
+
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
@@ -41,3 +44,6 @@ jobs:
 
       - name: Run migrations
         run: go run ./cmd/migrate/main.go
+
+      - name: Run integration tests
+        run: go test -tags=integration ./...
