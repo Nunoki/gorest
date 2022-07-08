@@ -2,7 +2,7 @@
 
 ![Gopher logo](gopher.png)
 
-GoREST is a boilerplate REST API implemented in Go. It implements:
+GoREST is a boilerplate REST API implemented in Go. It features:
 
 - Sample JSON endpoints
 - Postgres database client
