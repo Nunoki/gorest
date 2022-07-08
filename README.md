@@ -9,7 +9,8 @@ GoREST is a boilerplate REST API implemented in Go. It implements:
 - Authentication middleware (+sample JWT code)
 - Large payload protection middleware
 - Dockerization (+database migration)
-- Tests
+- Unit and integration Tests
+- Github Actions CI
 
 It exposes 4 total endpoints, 3 of which are behind authentication middleware, 1 is public. The 1 public endpoint is a `/ping` endpoint, which only returns a `"pong"` in plain text. The other 3 are `GET`, `PUT` and `DELETE` endpoints for manipulating JSON-formatted data, which will be stored in the database corresponding to whatever user ID the authentication middleware resolves. 
 
@@ -22,30 +23,36 @@ In this boilerplate state, the bearer token requires a value of `debug` (as demo
 > - Docker Engine 20.10+ and Docker Compose 1.27+, or Podman equivalent
 > - Set up values in the `.env` file using `.env.example` as template
 
-## Option 1: To get the service up and running
+## Option 1: To only get the service up and running
 
-    docker-compose up -d
+    docker-compose up
 
 ## Option2: For local development
 
-For development, you can only get the database container up, and then use your local `go` environment.
+- **Step 1: Get the database container up**
 
-To get the database container up, you can use the following convenience script:
+  Use the following convenience script:
+  
+      ./scripts/database.sh
+  
+  It is equivalent to doing `docker-compose up postgres -d`, with environment variables passed.
 
-    ./scripts/database.sh
+- **Step 2: Run migrations**
 
-It is equivalent to doing `docker-compose up postgres -d`, with environment variables passed.
+  If this is the first time you created the database container, or any time you create new migrations required by the app, use the following convenience script to run the migrations:
+  
+      ./scripts/migrate.sh
+  
+  It is equivalent to doing `go run ./cmd/migrate/main.go`, with environment variables passed.
 
-Then, if this is the first time you created the database container, run the necessary migrations. You can use the following convenience script:
+- **Step 3: Develop and run or build**
 
-    ./scripts/migrate.sh
-
-It is equivalent to doing `go run ./cmd/migrate/main.go`, with environment variables passed.
-
-Then, you can `source` the `.env` file and run the `go run` commands as usual. Or, use one of the following convenience scripts:
-
-1. `./scripts/service-start.sh` — equivalent of doing `go build ./cmd/gorest/main.go` with environment variables passed
-2. `./scripts/air.sh` — equivalent of running [air](http://github.com/cosmtrek/air) with environment variables passed
+  You can now `source` the `.env` file and run the `go run` commands as usual. 
+  
+  Alternatively, you can use one of the following convenience scripts:
+  
+  1. `./scripts/service-start.sh` — equivalent of doing `go run ./cmd/gorest/main.go` with environment variables passed
+  2. `./scripts/air.sh` — equivalent of running [air](http://github.com/cosmtrek/air) with environment variables passed
 
 # Sample curl commands to use the service
 
