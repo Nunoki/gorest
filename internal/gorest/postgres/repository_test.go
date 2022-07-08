@@ -12,7 +12,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/nunoki/gorest/internal/beetroot"
+	"github.com/nunoki/gorest/internal/gorest"
 )
 
 var (
@@ -71,15 +71,15 @@ func TestMain(m *testing.M) {
 
 func TestFindNonexistentReturnsCorrectError(t *testing.T) {
 	nonexistent := "f44fe12d-8bec-4720-845e-dbebcc053f90"
-	if _, _, err := client.Find(nonexistent); err != beetroot.ErrNoRows {
-		t.Fatal("expected:", beetroot.ErrNoRows, "received:", err)
+	if _, _, err := client.Find(nonexistent); err != gorest.ErrNoRows {
+		t.Fatal("expected:", gorest.ErrNoRows, "received:", err)
 	}
 }
 
 func TestDeleteNonexistentReturnsCorrectError(t *testing.T) {
 	nonexistent := "f44fe12d-8bec-4720-845e-dbebcc053f91"
-	if err := client.Delete(nonexistent); err != beetroot.ErrNoRows {
-		t.Fatal("expected:", beetroot.ErrNoRows, "received:", err)
+	if err := client.Delete(nonexistent); err != gorest.ErrNoRows {
+		t.Fatal("expected:", gorest.ErrNoRows, "received:", err)
 	}
 }
 
@@ -127,8 +127,8 @@ func TestDeleteAndFetch(t *testing.T) {
 	}
 
 	c, _, err = client.Find(userID)
-	if err != beetroot.ErrNoRows {
-		t.Fatal("expected:", beetroot.ErrNoRows, "received:", err)
+	if err != gorest.ErrNoRows {
+		t.Fatal("expected:", gorest.ErrNoRows, "received:", err)
 	}
 	if c != nil {
 		t.Fatal("expected to be deleted, but is still present", c)

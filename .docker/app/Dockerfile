@@ -12,4 +12,4 @@ COPY . .
 RUN go build -v -o /usr/local/bin/ ./...
 
 CMD ["migrate"]
-CMD ["beetroot"]
+CMD ["gorest"]

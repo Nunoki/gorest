@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/nunoki/gorest/internal/beetroot"
-	"github.com/nunoki/gorest/internal/beetroot/postgres"
+	"github.com/nunoki/gorest/internal/gorest"
+	"github.com/nunoki/gorest/internal/gorest/postgres"
 )
 
 var (
@@ -26,7 +26,7 @@ func main() {
 		pg.Close()
 	}()
 
-	s := beetroot.NewServer(pg)
+	s := gorest.NewServer(pg)
 	port := getPort()
 	println("Listening on port " + port)
 	log.Fatal(http.ListenAndServe(":"+port, s))
