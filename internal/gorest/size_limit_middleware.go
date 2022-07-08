@@ -1,4 +1,4 @@
-package beetroot
+package gorest
 
 import (
 	"net/http"

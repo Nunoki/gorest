@@ -28,7 +28,7 @@ for DIST in $(echo "$DIST_LIST"); do
     IFS=/ read -ra RES <<< "$DIST"
     echo "Building ${RES[0]}/${RES[1]}"
 
-    GOOS=${RES[0]} GOARCH=${RES[1]} go build -v -o $OUTPUT_DIR/beetroot-${RES[0]}-${RES[1]} ./cmd/beetroot/main.go
+    GOOS=${RES[0]} GOARCH=${RES[1]} go build -v -o $OUTPUT_DIR/gorest-${RES[0]}-${RES[1]} ./cmd/gorest/main.go
     GOOS=${RES[0]} GOARCH=${RES[1]} go build -v -o $OUTPUT_DIR/migrate-${RES[0]}-${RES[1]} ./cmd/migrate/main.go
 
     # count results

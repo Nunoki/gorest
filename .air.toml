@@ -2,7 +2,7 @@ root = "."
 tmp_dir = "tmp"
 
 [build]
-  cmd = "go build -o ./tmp/main ./cmd/beetroot"
+  cmd = "go build -o ./tmp/main ./cmd/gorest"
   delay = 1000
   exclude_dir = ["assets", "tmp", "vendor"]
   exclude_file = []

@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v4"
-	"github.com/nunoki/gorest/internal/beetroot"
+	"github.com/nunoki/gorest/internal/gorest"
 )
 
 const queryFind = `
@@ -43,7 +43,7 @@ func (r Client) Find(userID string) ([]byte, time.Time, error) {
 		)
 
 	if err == pgx.ErrNoRows {
-		return blob, modifiedAt, beetroot.ErrNoRows
+		return blob, modifiedAt, gorest.ErrNoRows
 	}
 
 	if err != nil {
@@ -54,7 +54,7 @@ func (r Client) Find(userID string) ([]byte, time.Time, error) {
 }
 
 // Update will update the stored blob for the specified userID, as long as the provided blob is a
-// valid JSON; if the validation fails, a special beetroot.ErrInvalidJSON error is returned.
+// valid JSON; if the validation fails, a special gorest.ErrInvalidJSON error is returned.
 func (r Client) Update(userID string, content []byte) error {
 	_, err := r.conn.Exec(
 		context.Background(),
@@ -67,14 +67,14 @@ func (r Client) Update(userID string, content []byte) error {
 	if err != nil && strings.Contains(err.Error(), "22P02") {
 		return err
 		// TODO: this condition is also satisfied when the userID is in an incorrect format!
-		// return beetroot.ErrInvalidJSON
+		// return gorest.ErrInvalidJSON
 	}
 
 	return err
 }
 
 // Delete will delete any stored blob tied to the specified userID. The special error
-// beetroot.ErrNoRows is returned if there was no data to delete for the user.
+// gorest.ErrNoRows is returned if there was no data to delete for the user.
 func (r Client) Delete(userID string) error {
 	tag, err := r.conn.Exec(
 		context.Background(),
@@ -87,7 +87,7 @@ func (r Client) Delete(userID string) error {
 	}
 
 	if tag.RowsAffected() < 1 {
-		return beetroot.ErrNoRows
+		return gorest.ErrNoRows
 	}
 
 	return nil

@@ -1,4 +1,4 @@
-package beetroot
+package gorest
 
 // TODO: update these tests to create own server with attached middleware, since the app doesn't
 // necessarily have to use the JWT auth middleware
