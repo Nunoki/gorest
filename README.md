@@ -2,19 +2,28 @@
 
 ![Gopher logo](gopher.png)
 
-GoREST is a boilerplate REST API implemented in Go. It features:
-
-- Sample JSON endpoints
-- Postgres database client
-- Authentication middleware (+sample JWT code)
-- Large payload protection middleware
-- Dockerization (+database migration)
-- Unit and integration Tests
-- Github Actions CI
+GoREST is a boilerplate REST API implemented in Go. 
 
 It exposes 4 total endpoints, 3 of which are behind authentication middleware, 1 is public. The 1 public endpoint is a `/ping` endpoint, which only returns a `"pong"` in plain text. The other 3 are `GET`, `PUT` and `DELETE` endpoints for manipulating JSON-formatted data, which will be stored in the database corresponding to whatever user ID the authentication middleware resolves. 
 
 In this boilerplate state, the bearer token requires a value of `debug` (as demonstrated in [Sample curl commands to use the service](#sample-curl-commands-to-use-the-service)), and the resolved user ID will be `00000000-0000-0000-0000-000000000000` (valid UUIDv4 format required by the user table).
+
+# Development roadmap
+
+- [x] HTTP handlers
+- [x] Sample JSON endpoints
+- [x] Postgres database client
+- [x] Authentication middleware (+sample JWT code)
+- [x] Large payload protection middleware
+- [x] Dockerization 
+- [x] Database migrations
+- [x] Unit and integration Tests
+- [x] Github Actions CI
+- [ ] Listen on HTTPS
+- [ ] Swagger documentation
+- [ ] GRPC
+- [ ] GraphQL
+- [ ] Turn into Cookiecutter template
 
 # How to run
 
