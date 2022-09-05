@@ -10,10 +10,9 @@ import (
 // AuthMiddleware will call the appropriate authorization method, and then call the subsequent
 // handler call if the authorization was successful. If it wasn't, a StatusUnauthorized status
 // code will be output, and execution terminated
-func AuthMiddleware(pubkey string) gin.HandlerFunc {
+func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		err := dummyAuth(c)
-		// err := jwtAuth(c, pubkey)
 
 		if err != nil {
 			c.AbortWithStatusJSON(

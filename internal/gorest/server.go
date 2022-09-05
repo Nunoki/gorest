@@ -31,8 +31,7 @@ func NewServer(repo Repository) *Server {
 	g := s.router.Group("")
 
 	// auth middleware before routes, order matters because it sets the user id in the context
-	publicKey := getJWTPublicKey()
-	g.Use(AuthMiddleware(publicKey))
+	g.Use(AuthMiddleware())
 
 	// business logic goes here
 	g.GET("/", handler.HandleRead)
@@ -53,17 +52,6 @@ func NewServer(repo Repository) *Server {
 // ServeHTTP just wraps Gin's ServeHTTP
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.router.ServeHTTP(w, r)
-}
-
-// TODO: move this and getPayloadSizeLimit() into main instead
-// getJWTPublicKey returns the public key for verifying JWT's from Lettuce, which in its current
-// iteration is passed via an environment variable
-func getJWTPublicKey() string {
-	pkey := os.Getenv("JWT_PUBLIC_KEY")
-	if len(pkey) == 0 {
-		log.Print("Missing env variable JWT_PUBLIC_KEY")
-	}
-	return pkey
 }
 
 // Returns the byte limit for the payload, which should be passed as an environment variable
