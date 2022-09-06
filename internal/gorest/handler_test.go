@@ -68,5 +68,29 @@ func TestPutRequestWithRepositoryErrorShouldFailWith500(t *testing.T) {
 	}
 }
 
-// TODO: test that empty payload returns a 400 error
+func TestSavingEmptyPayloadReturns400(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	s := Server{
+		router: gin.New(),
+	}
+
+	repo := &RepositoryMock{}
+	handler := NewHandler(repo)
+	s.router.PUT("/", func(c *gin.Context) {
+		c.Set("userID", testUserID)
+		handler.HandleStore(c)
+	})
+
+	w := httptest.NewRecorder()
+	r, _ := http.NewRequest("PUT", "/", strings.NewReader(""))
+	r.Header.Set("Content-type", "application/json")
+	s.ServeHTTP(w, r)
+
+	res := w.Result()
+
+	if res.StatusCode != 400 {
+		t.Fatalf("Empty payload should result in error 400, received %d instead", res.StatusCode)
+	}
+}
+
 // TODO: test output format and the date format
