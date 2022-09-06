@@ -4,8 +4,13 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"testing"
+	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 type MyWriter struct {
@@ -20,53 +25,40 @@ func (w *MyWriter) Write(p []byte) (n int, err error) {
 func TestGinEngineAttached(t *testing.T) {
 	log.SetOutput(io.Discard)
 	repo := RepositoryMock{}
-	s := NewServer(&repo)
+	s := NewServer(&repo, false)
 
 	if fmt.Sprintf("%T", s.router) != "*gin.Engine" {
 		t.Fatal("Gin engine not attached to server")
 	}
 }
 
-/*
-func TestJWTAuthMiddlewareAttached(t *testing.T) {
-	log.SetOutput(ioutil.Discard)
-	repo := RepositoryMock{}
+func TestDummyAuthAttached(t *testing.T) {
+	log.SetOutput(io.Discard)
 	gin.SetMode(gin.TestMode)
+	repo := RepositoryMock{}
 
-	router := NewServer(&repo)
-
-	token := "invalid.token.string"
-
-	writer := httptest.NewRecorder()
-	resp, _ := http.NewRequest("GET", "/", strings.NewReader("123"))
-	resp.Header.Set("Authorization", token)
-	router.ServeHTTP(writer, resp)
-
-	if writer.Code != http.StatusUnauthorized {
-		t.Fatalf("Expected code %d, received %d", http.StatusUnauthorized, writer.Code)
+	repo.FindFunc = func(s string) ([]byte, time.Time, error) {
+		return []byte(""), time.Now(), nil
 	}
+	s := NewServer(&repo, false)
+
+	req, _ := http.NewRequest("GET", "/", nil)
+	rec := httptest.NewRecorder()
+	s.ServeHTTP(rec, req)
+
+	if rec.Result().StatusCode != 401 {
+		t.Fatalf("expected response code 401, received %d", rec.Result().StatusCode)
+	}
+
+	req.Header.Set("Authorization", "Bearer debug")
+	rec = httptest.NewRecorder()
+	s.ServeHTTP(rec, req)
+
+	if rec.Result().StatusCode != 200 {
+		t.Fatalf("expected response code 200, received %d", rec.Result().StatusCode)
+	}
+
 }
-
-func TestGetJWTPublicKey(t *testing.T) {
-	testKey := "hello i am key"
-	os.Setenv("JWT_PUBLIC_KEY", testKey)
-	key := getJWTPublicKey()
-	if key != testKey {
-		t.Fatalf("Incorrect key returned; received %q, expected %q", key, testKey)
-	}
-
-	w := &MyWriter{}
-	log.SetOutput(w)
-	os.Unsetenv("JWT_PUBLIC_KEY")
-	key = getJWTPublicKey()
-	if key != "" {
-		t.Fatal("Expected key to be empty, received:", key)
-	}
-	if !strings.Contains(string(w.Content), "JWT_PUBLIC_KEY") {
-		t.Fatal("Warning should have been logged about missing public key declaration")
-	}
-}
-*/
 
 func TestGetPayloadSizeLimit(t *testing.T) {
 	log.SetOutput(io.Discard)
