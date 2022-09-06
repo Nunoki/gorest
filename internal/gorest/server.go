@@ -17,9 +17,13 @@ type Server struct {
 
 // NewServer returns an instantiation of a Server with the repository from repo, and the
 // AuthMiddleware attached, and sets up the route handlers
-func NewServer(repo Repository) *Server {
+func NewServer(repo Repository, ginLogger bool) *Server {
 	s := Server{
-		router: gin.Default(),
+		router: gin.New(),
+	}
+
+	if ginLogger {
+		s.router.Use(gin.Logger())
 	}
 
 	// limit payload size to prevent large payload attack

@@ -26,7 +26,7 @@ func main() {
 		pg.Close()
 	}()
 
-	s := gorest.NewServer(pg)
+	s := gorest.NewServer(pg, true)
 	port := getPort()
 	println("Listening on port " + port)
 	log.Fatal(http.ListenAndServe(":"+port, s))
