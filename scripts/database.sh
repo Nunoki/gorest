@@ -9,10 +9,10 @@ HELPTEXT="Start (unless --stop argument is provided) only the database container
 "
 source $(dirname "$0")/_help_text.sh $@
 
-CMD_DOCKER=podman-compose
+CMD_COMPOSE=podman-compose
 if command -v docker-compose &> /dev/null
 then
-	CMD_DOCKER=docker-compose
+	CMD_COMPOSE=docker-compose
 fi
 
 if [[ $* == *--stop\ * || $* == *--stop ]]; then
@@ -27,7 +27,7 @@ else
 	ARG_D="-d"
 fi
 
-COMMAND="$CMD_DOCKER $ARG $ARG_D postgres"
+COMMAND="$CMD_COMPOSE $ARG $ARG_D postgres"
 echo $COMMAND
 $COMMAND 2> /dev/null
 echo "Done."

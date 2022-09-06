@@ -29,12 +29,12 @@ else
 fi
 
 # Get appropriate docker-compose handler
-source "$(dirname "$0")/_get_docker_command.sh"
+source "$(dirname "$0")/_get_compose_command.sh"
 
 # Optional check for postgres container is up, required for integration tests, but the database
 # doesn't necessarily have to come from a virtual container
 # if [[ $FLAG_COVERAGE_STATUS == "0" ]]; then
-# 	$CMD_DOCKER exec postgres echo "up" &> /dev/null
+# 	$CMD_COMPOSE exec postgres echo "up" &> /dev/null
 # 	if [[ "$?" -ne "0" ]]; then
 # 		echo "Database container needs to be running for integration tests."
 # 		echo "Use \`./scripts/database.sh\`"

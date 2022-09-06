@@ -12,8 +12,8 @@ set -a; source .env
 
 # Optional check for postgres container being up, but the database used doesn't necessarily 
 # have to come from a virtual container
-# source "$(dirname "$0")/_get_docker_command.sh"
-# $CMD_DOCKER exec postgres echo "up" &> /dev/null
+# source "$(dirname "$0")/_get_compose_command.sh"
+# $CMD_COMPOSE exec postgres echo "up" &> /dev/null
 # if [[ "$?" -ne "0" ]]; then
 # 	echo "Database container needs to be running."
 # 	echo "Use \`./scripts/database.sh\`"

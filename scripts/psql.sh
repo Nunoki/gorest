@@ -3,8 +3,8 @@ HELPTEXT="Open the psql interface in an interactive shell within the postgres co
 source $(dirname "$0")/_help_text.sh $@
 
 # Check postgres container is up
-source "$(dirname "$0")/_get_docker_command.sh"
-$CMD_DOCKER exec postgres echo "up" &> /dev/null
+source "$(dirname "$0")/_get_compose_command.sh"
+$CMD_COMPOSE exec postgres echo "up" &> /dev/null
 if [[ "$?" -ne "0" ]]; then
 	echo "Database container needs to be running."
 	echo "Use \`./scripts/database.sh\`"
@@ -12,4 +12,4 @@ if [[ "$?" -ne "0" ]]; then
 fi
 
 set -a; source .env;
-$CMD_DOCKER exec postgres bash -c "psql -U ${POSTGRES_USER} ${POSTGRES_DB}"
+$CMD_COMPOSE exec postgres bash -c "psql -U ${POSTGRES_USER} ${POSTGRES_DB}"
