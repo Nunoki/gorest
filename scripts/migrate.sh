@@ -1,5 +1,4 @@
 #!/bin/bash
-# DOCME
 HELPTEXT="Run migrations on the database. Database container needs to be up; warning will be printed if it isn't.
 
 	--down

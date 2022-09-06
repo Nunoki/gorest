@@ -1,5 +1,4 @@
 #!/bin/bash
-# DOCME
 HELPTEXT="Run unit or integration tests, and optionally generate and open test coverage results.
 
 	--integration
