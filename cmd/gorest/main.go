@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -28,7 +29,7 @@ func main() {
 
 	s := gorest.NewServer(pg, true)
 	port := getPort()
-	println("Listening on port " + port)
+	fmt.Println("Listening on port " + port)
 	log.Fatal(http.ListenAndServe(":"+port, s))
 }
 
