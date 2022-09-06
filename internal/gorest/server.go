@@ -30,12 +30,14 @@ func NewServer(repo Repository, ginLogger bool) *Server {
 	limit := getPayloadSizeLimit()
 	s.router.Use(SizeLimitMiddleware(limit))
 
-	// create handler group, so that we can extract /ping as a public route
 	handler := NewHandler(repo)
+
+	// create handler group, so that we can extract /ping as a public route
 	g := s.router.Group("")
 
 	// auth middleware before routes, order matters because it sets the user id in the context
 	g.Use(AuthMiddleware())
+	g.Use(ContentTypeMiddleware())
 
 	// business logic goes here
 	g.GET("/", handler.HandleRead)
