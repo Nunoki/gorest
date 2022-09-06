@@ -69,3 +69,4 @@ func TestPutRequestWithRepositoryErrorShouldFailWith500(t *testing.T) {
 }
 
 // TODO: test that empty payload returns a 400 error
+// TODO: test output format and the date format

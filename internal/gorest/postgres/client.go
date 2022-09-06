@@ -67,6 +67,7 @@ func ConnectionString(username, password, db, host, port string) string {
 	db = url.QueryEscape(db)
 	port = url.QueryEscape(port)
 
+	// TODO: Make an execution flag for disabling sslmode
 	return fmt.Sprintf(
 		"postgres://%s:%s@%s:%s/%s?sslmode=disable",
 		username,
