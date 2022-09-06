@@ -18,6 +18,7 @@ func (w *MyWriter) Write(p []byte) (n int, err error) {
 }
 
 func TestGinEngineAttached(t *testing.T) {
+	log.SetOutput(io.Discard)
 	repo := RepositoryMock{}
 	s := NewServer(&repo)
 
@@ -78,8 +79,7 @@ func TestGetPayloadSizeLimit(t *testing.T) {
 		{"600", 600},
 		{"10000", 10000},
 		{"-5", def},
-		{"600", 600},
-		{"600", 600},
+		{"1", 1},
 	}
 
 	for _, test := range tests {
@@ -96,9 +96,3 @@ func TestGetPayloadSizeLimit(t *testing.T) {
 		t.Fatalf("Got %d, expected %d", limit, def)
 	}
 }
-
-// TODO: How can i circumvent the auth middleware in a test to only test if the size limiter gets
-// its default size set correctly
-// func TestSizeLimiterGetsDefaultSize(t *testing.T) {
-// 	server := NewServer()
-// }
