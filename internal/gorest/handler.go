@@ -127,10 +127,7 @@ func (h Handler) HandleStore(c *gin.Context) {
 		return
 	}
 
-	c.JSON(
-		http.StatusOK,
-		len(b),
-	)
+	c.JSON(http.StatusOK, len(b))
 }
 
 // HandleDelete will delete any data tied to the authenticated user. It will output the appropriate
@@ -158,8 +155,5 @@ func (h Handler) HandleDelete(c *gin.Context) {
 	}
 
 	// if we got here, the user was deleted
-	c.JSON(
-		http.StatusOK,
-		"Deleted",
-	)
+	c.JSON(http.StatusOK, "Deleted")
 }
