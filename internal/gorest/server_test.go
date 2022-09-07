@@ -43,6 +43,8 @@ func TestDummyAuthAttached(t *testing.T) {
 	s := NewServer(&repo, false)
 
 	req, _ := http.NewRequest("GET", "/", nil)
+	req.Header.Add("Content-type", "application/json")
+	req.Header.Add("Accept", "application/json")
 	rec := httptest.NewRecorder()
 	s.ServeHTTP(rec, req)
 
