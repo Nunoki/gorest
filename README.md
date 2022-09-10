@@ -74,11 +74,11 @@ To ping the service:
 
 To store a sample data of `123` (stored data can be any valid JSON):
 
-    curl -i -H "Authorization: Bearer debug" -X PUT -d "123" localhost:1337
+    curl -i -H "Authorization: Bearer debug" -H "Content-Type: application/json" -X PUT -d "123" localhost:1337
 
 To retreive previously stored data:
 
-    curl -i -H "Authorization: Bearer debug" localhost:1337
+    curl -i -H "Authorization: Bearer debug" -H "Accept: application/json" localhost:1337
 
 To delete any stored data:
 
