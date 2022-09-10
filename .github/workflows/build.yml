@@ -15,6 +15,7 @@ env:
   POSTGRES_USER: dev
   POSTGRES_PASSWORD: dev
   POSTGRES_DB: dev
+  POSTGRES_SSLMODE: disable
 
   # irrelevant values, but required properties
   APP_PORT: 1337
