@@ -43,6 +43,7 @@ func ConnectionStringFromEnv() string {
 	db := os.Getenv("POSTGRES_DB")
 	port := os.Getenv("POSTGRES_PORT")
 	host := os.Getenv("POSTGRES_HOST")
+	sslmode := os.Getenv("POSTGRES_SSLMODE")
 
 	if len(port) == 0 {
 		port = defaultPostgresPort
@@ -53,26 +54,26 @@ func ConnectionStringFromEnv() string {
 	}
 
 	if len(u) == 0 || len(pw) == 0 || len(db) == 0 {
-		panic("missing required parameter for database connection, required: POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB, optional: POSTGRES_HOST, POSTGRES_PORT")
+		panic("missing required parameter for database connection; required: POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB, optional: POSTGRES_HOST, POSTGRES_PORT")
 	}
 
-	return ConnectionString(u, pw, db, host, port)
+	return ConnectionString(u, pw, db, host, port, sslmode)
 }
 
 // ConnectionString returns the postgres connection string with parameters defined in the
 // call arguments
-func ConnectionString(username, password, db, host, port string) string {
+func ConnectionString(username, password, db, host, port, sslmode string) string {
 	username = url.QueryEscape(username)
 	password = url.QueryEscape(password)
 	db = url.QueryEscape(db)
-	port = url.QueryEscape(port)
 
 	return fmt.Sprintf(
-		"postgres://%s:%s@%s:%s/%s?sslmode=disable",
+		"postgres://%s:%s@%s:%s/%s?sslmode=%s",
 		username,
 		password,
 		host,
 		port,
 		db,
+		sslmode,
 	)
 }

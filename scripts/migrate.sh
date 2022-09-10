@@ -1,5 +1,4 @@
 #!/bin/bash
-# DOCME
 HELPTEXT="Run migrations on the database. Database container needs to be up; warning will be printed if it isn't.
 
 	--down
@@ -10,14 +9,15 @@ source $(dirname "$0")/_help_text.sh $@
 
 set -a; source .env
 
-# Check postgres container is up
-source "$(dirname "$0")/_get_docker_command.sh"
-$CMD_DOCKER exec postgres echo "up" &> /dev/null
-if [[ "$?" -ne "0" ]]; then
-	echo "Database container needs to be running."
-	echo "Use \`./scripts/database.sh\`"
-	exit 0
-fi
+# Optional check for postgres container being up, but the database used doesn't necessarily 
+# have to come from a virtual container
+# source "$(dirname "$0")/_get_compose_command.sh"
+# $CMD_COMPOSE exec postgres echo "up" &> /dev/null
+# if [[ "$?" -ne "0" ]]; then
+# 	echo "Database container needs to be running."
+# 	echo "Use \`./scripts/database.sh\`"
+# 	exit 0
+# fi
 
 if [[ "$1" == "--down" ]]; then
 	IS_NUM='^[0-9]+$'

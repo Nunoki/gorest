@@ -15,8 +15,9 @@ env:
   POSTGRES_USER: dev
   POSTGRES_PASSWORD: dev
   POSTGRES_DB: dev
+  POSTGRES_SSLMODE: disable
 
-  # irrelevant but required
+  # irrelevant values, but required properties
   APP_PORT: 1337
   PAYLOAD_BYTE_LIMIT: 5000
 

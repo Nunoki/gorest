@@ -1,77 +1,54 @@
 package gorest
 
-// TODO: update these tests to create own server with attached middleware, since the app doesn't
-// necessarily have to use the JWT auth middleware
-// TODO: Test dummyAuth()
-/*
-func TestValidJWT(t *testing.T) {
-	log.SetOutput(ioutil.Discard) // REMOVE
-	token := jwt.NewWithClaims(jwt.SigningMethodEdDSA, jwt.RegisteredClaims{
-		Issuer:    "Laravel",
-		IssuedAt:  &jwt.NumericDate{Time: time.Now().Add(-time.Second)},
-		ExpiresAt: &jwt.NumericDate{Time: time.Now().Add(time.Hour)},
-		Subject:   "f44fe12d-8bec-4720-845e-dbebcc053f9e",
-	})
+import (
+	"io"
+	"net/http"
+	"net/http/httptest"
+	"testing"
 
-	pubKey, privKey, _ := ed25519.GenerateKey(nil)
-	tokenString, err := token.SignedString(privKey)
-	if err != nil {
-		t.Fatal("failed to generate signed token for test")
-	}
+	"github.com/gin-gonic/gin"
+)
 
-	base64PubKey := base64.StdEncoding.EncodeToString(pubKey)
-
+func TestDummyAuthOk(t *testing.T) {
 	gin.SetMode(gin.TestMode)
-	router := gin.New()
-	router.Use(AuthMiddleware(base64PubKey))
+	r := gin.New()
+	r.Use(AuthMiddleware())
 
-	handlerOk := false
-	router.GET("/", func(c *gin.Context) {
-		userID, _ := c.Get("userID")
-
-		uid, ok := userID.(string)
-		if !ok {
-			t.Fatal("User id is not a string", uid)
-		}
-		if uid != "f44fe12d-8bec-4720-845e-dbebcc053f9e" {
-			t.Fatal("User id does not match", uid)
-		}
-
-		body, _ := io.ReadAll(c.Request.Body)
-		handlerOk = string(body) == `"hello world"`
+	r.GET("/", func(c *gin.Context) {
+		c.String(http.StatusOK, "ok")
 	})
 
-	w := httptest.NewRecorder()
-	r, _ := http.NewRequest("GET", "/", strings.NewReader(`"hello world"`))
-	r.Header.Set("Authorization", tokenString)
-	router.ServeHTTP(w, r)
+	resp := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", "/", nil)
+	req.Header.Set("Authorization", "Bearer debug")
+	r.ServeHTTP(resp, req)
 
-	if w.Code != http.StatusOK {
-		t.Fatalf("Expected response code %d, got %d", http.StatusOK, w.Code)
+	res := resp.Result()
+	if res.StatusCode != 200 {
+		t.Fatalf("expected code 200, received %d", res.StatusCode)
 	}
-
-	if !handlerOk {
-		t.Fatal("Handler not called, or content doesn't match")
+	content, _ := io.ReadAll(res.Body)
+	if string(content) != "ok" {
+		t.Fatalf("expected body to equal \"ok\", received %s", string(content))
 	}
 }
 
-func TestShouldFailWithInvalidJWT(t *testing.T) {
-	log.SetOutput(ioutil.Discard) // REMOVE
-	token := "invalid.token.string"
-
+func TestDummyAuthForbidden(t *testing.T) {
 	gin.SetMode(gin.TestMode)
-	router := gin.New()
-	router.Use(AuthMiddleware(""))
-	router.GET("/", func(c *gin.Context) {
-		t.Fatal("Handler method should not get called")
-	})
-	w := httptest.NewRecorder()
-	r, _ := http.NewRequest("GET", "/", strings.NewReader(`"hello world"`))
-	r.Header.Set("Authorization", token)
-	router.ServeHTTP(w, r)
+	r := gin.New()
+	r.Use(AuthMiddleware())
 
-	if w.Code != http.StatusUnauthorized {
-		t.Fatalf("Expected code %d, received %d", http.StatusUnauthorized, w.Code)
+	r.GET("/", func(c *gin.Context) {
+		c.String(http.StatusOK, "ok")
+	})
+
+	resp := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", "/", nil)
+	r.ServeHTTP(resp, req)
+
+	res := resp.Result()
+
+	if res.StatusCode != 401 {
+		t.Fatalf("expected code 401, received %d", res.StatusCode)
 	}
 }
-*/

@@ -17,22 +17,27 @@ type Server struct {
 
 // NewServer returns an instantiation of a Server with the repository from repo, and the
 // AuthMiddleware attached, and sets up the route handlers
-func NewServer(repo Repository) *Server {
+func NewServer(repo Repository, ginLogger bool) *Server {
 	s := Server{
-		router: gin.Default(),
+		router: gin.New(),
+	}
+
+	if ginLogger {
+		s.router.Use(gin.Logger())
 	}
 
 	// limit payload size to prevent large payload attack
 	limit := getPayloadSizeLimit()
 	s.router.Use(SizeLimitMiddleware(limit))
 
-	// create handler group, so that we can extract /ping as a public route
 	handler := NewHandler(repo)
+
+	// create handler group, so that we can extract /ping as a public route
 	g := s.router.Group("")
 
 	// auth middleware before routes, order matters because it sets the user id in the context
-	publicKey := getJWTPublicKey()
-	g.Use(AuthMiddleware(publicKey))
+	g.Use(AuthMiddleware())
+	g.Use(ContentTypeMiddleware())
 
 	// business logic goes here
 	g.GET("/", handler.HandleRead)
@@ -53,17 +58,6 @@ func NewServer(repo Repository) *Server {
 // ServeHTTP just wraps Gin's ServeHTTP
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.router.ServeHTTP(w, r)
-}
-
-// TODO: move this and getPayloadSizeLimit() into main instead
-// getJWTPublicKey returns the public key for verifying JWT's from Lettuce, which in its current
-// iteration is passed via an environment variable
-func getJWTPublicKey() string {
-	pkey := os.Getenv("JWT_PUBLIC_KEY")
-	if len(pkey) == 0 {
-		log.Print("Missing env variable JWT_PUBLIC_KEY")
-	}
-	return pkey
 }
 
 // Returns the byte limit for the payload, which should be passed as an environment variable

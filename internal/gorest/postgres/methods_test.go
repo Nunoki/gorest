@@ -102,7 +102,11 @@ func TestUpdateAndFetch(t *testing.T) {
 	}
 
 	if start.After(ts) {
-		t.Fatal("returned modified date cannot be in the past")
+		t.Fatalf(
+			"returned modified time cannot be in the past, modified time: %s, current time: %s",
+			ts,
+			start,
+		)
 	}
 }
 

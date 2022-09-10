@@ -1,11 +1,12 @@
 module github.com/nunoki/gorest
 
-go 1.17
+go 1.19
 
 require (
 	github.com/gin-gonic/gin v1.7.7
 	github.com/golang-migrate/migrate/v4 v4.15.1
 	github.com/jackc/pgx/v4 v4.15.0
+	github.com/nunoki/go-util v0.0.0-20220906163708-e898bfa8db3c
 )
 
 require (
