@@ -63,11 +63,10 @@ func (r Client) Update(userID string, content []byte) error {
 		content,
 	)
 
-	// XXX: Is there a more elegant way to check for this type of error?
 	if err != nil && strings.Contains(err.Error(), "22P02") {
-		return err
-		// TODO: this condition is also satisfied when the userID is in an incorrect format!
-		// return gorest.ErrInvalidJSON
+		// this condition is also satisfied when the userID is in an incorrect format, but we're
+		// assuming that to be impossible for this context
+		return gorest.ErrInvalidJSON
 	}
 
 	return err
