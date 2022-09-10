@@ -11,7 +11,8 @@ import (
 // content-type, and that the client accepts application/json in return
 func ContentTypeMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if c.Request.Header.Get("content-type") != "application/json" {
+		if (c.Request.Method == "PUT" || c.Request.Method == "POST") &&
+			!array.Contains(c.Request.Header["Content-Type"], "application/json") {
 			c.AbortWithStatusJSON(
 				http.StatusNotAcceptable,
 				"Content-type expected to be application/json",
