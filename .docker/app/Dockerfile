@@ -1,4 +1,3 @@
-# TODO: verify and test
 FROM golang:1.18-alpine
 
 WORKDIR /usr/src/app
