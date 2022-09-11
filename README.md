@@ -29,39 +29,25 @@ In this boilerplate state, the bearer token requires a value of `debug` (as demo
 
 > **Requirements:**
 > 
-> - Docker Engine 20.10+ and Docker Compose 1.27+, or Podman equivalent
+> - Docker Compose 1.27+, or Podman equivalent
 > - Set up values in the `.env` file using `.env.example` as template
+> - Go 1.18+ (if running [option 2](#option-2-for-local-development-using-go-toolchain))
+> - Optional: Air (to use live-reloading in [option 2 step 3](#option-2-for-local-development-using-go-toolchain))
 
-## Option 1: To only get the service up and running
+## Option 1: To only get the service up and running as is
 
     docker-compose up
 
-## Option2: For local development
+## Option 2: For local development using go toolchain
 
-- **Step 1: Get the database container up**
+The following is accomplished through convenience scripts which run simple commands via `go` and `docker`/`podman`, but with environment variables prepared and passed to the running processes.
 
-  Use the following convenience script:
-  
-      ./scripts/database.sh
-  
-  It is equivalent to doing `docker-compose up postgres -d`, with environment variables passed.
-
-- **Step 2: Run migrations**
-
-  If this is the first time you created the database container, or any time you create new migrations required by the app, use the following convenience script to run the migrations:
-  
-      ./scripts/migrate.sh
-  
-  It is equivalent to doing `go run ./cmd/migrate/main.go`, with environment variables passed.
-
-- **Step 3: Develop and run or build**
-
-  You can now `source` the `.env` file and run the `go run` commands as usual. 
-  
-  Alternatively, you can use one of the following convenience scripts:
-  
-  1. `./scripts/service-start.sh` — equivalent of doing `go run ./cmd/gorest/main.go` with environment variables passed
-  2. `./scripts/air.sh` — equivalent of running [air](http://github.com/cosmtrek/air) with environment variables passed
+1. Run `./scripts/database.sh`  
+ (gets only the database container up)
+2. Run `./scripts/migrate.sh`  
+ (only required if this is the first time you're creating the database container, or if you've made changes to the database; runs the database migrations)
+3. Run `./scripts/service-start.sh` (or `./scripts/air.sh` for live-reloading via [air](http://github.com/cosmtrek/air))  
+ (runs the app via `go run`)
 
 # Sample curl commands to use the service
 
