@@ -11,7 +11,26 @@ func NewServer(repo Repository, port string) *http.Server {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+
 		w.Write([]byte("pong"))
+	})
+
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/" {
+			http.NotFound(w, r)
+			return
+		}
+
+		if r.Method != http.MethodGet {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+
+		handleIndex(w, r)
 	})
 
 	server := &http.Server{
@@ -20,6 +39,10 @@ func NewServer(repo Repository, port string) *http.Server {
 	}
 
 	return server
+}
+
+func handleIndex(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("Hello world"))
 }
 
 // // ServeHTTP just wraps Gin's ServeHTTP
