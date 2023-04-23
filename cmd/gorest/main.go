@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 
 	"github.com/nunoki/gorest/internal/connstr"
@@ -31,7 +32,7 @@ func main() {
 	port := getPort()
 	s := gorest.NewServer(pg, port)
 	fmt.Println("Listening on port " + port)
-	log.Fatal(s.ListenAndServe())
+	log.Fatal(http.ListenAndServe(":"+port, s))
 }
 
 // getPort returns the port number that the app is specified to run on. It will try to read from
