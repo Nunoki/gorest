@@ -2,60 +2,30 @@ package gorest
 
 import (
 	"net/http"
-
-	"github.com/gin-gonic/gin"
 )
 
 const DefaultPayloadLimit = 1000 // #default_payload_limit
 
-type Server struct {
-	router *gin.Engine
-}
+// DOCME
+func NewServer(repo Repository, port string) *http.Server {
+	mux := http.NewServeMux()
 
-// NewServer returns an instantiation of a Server with the repository from repo, and the
-// AuthMiddleware attached, and sets up the route handlers
-func NewServer(repo Repository, ginLogger bool) *Server {
-	s := Server{
-		router: gin.New(),
-	}
-
-	if ginLogger {
-		s.router.Use(gin.Logger())
-	}
-
-	// limit payload size to prevent large payload attack
-	// limit := getPayloadSizeLimit()
-	// s.router.Use(SizeLimitMiddleware(limit))
-
-	handler := NewHandler(repo)
-
-	// create handler group, so that we can extract /ping as a public route
-	g := s.router.Group("")
-
-	// auth middleware before routes, order matters because it sets the user id in the context
-	// g.Use(AuthMiddleware())
-	// g.Use(ContentTypeMiddleware())
-
-	// business logic goes here
-	g.GET("/", handler.HandleRead)
-	g.PUT("/", handler.HandleStore)
-	g.DELETE("/", handler.HandleDelete)
-
-	// ping pong
-	s.router.GET("/ping", func(c *gin.Context) {
-		c.String(
-			http.StatusOK,
-			"pong\n",
-		)
+	mux.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("pong"))
 	})
 
-	return &s
+	server := &http.Server{
+		Addr:    ":" + port,
+		Handler: mux,
+	}
+
+	return server
 }
 
-// ServeHTTP just wraps Gin's ServeHTTP
-func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	s.router.ServeHTTP(w, r)
-}
+// // ServeHTTP just wraps Gin's ServeHTTP
+// func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+// 	s.router.ServeHTTP(w, r)
+// }
 
 // // Returns the byte limit for the payload, which should be passed as an environment variable
 // // PAYLOAD_BYTE_LIMIT; if it isn't, then a default limit of DefaultPayloadLimit will be returned
