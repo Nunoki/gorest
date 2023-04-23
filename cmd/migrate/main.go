@@ -7,6 +7,7 @@ import (
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
+	"github.com/nunoki/gorest/internal/connstr"
 	"github.com/nunoki/gorest/internal/gorest/postgres"
 )
 
@@ -16,7 +17,8 @@ func main() {
 	flag.UintVar(&down, "down", 0, "Specify to migrate down, defining how many migrations to roll back")
 	flag.Parse()
 
-	connStr := postgres.ConnectionStringFromEnv()
+	dbU, dbPW, db, dbH, dbP, dbSSL := connstr.FromEnv()
+	connStr := postgres.ConnectionString(dbU, dbPW, db, dbH, dbP, dbSSL)
 	m, err := migrate.New(
 		"file://.docker/postgres/",
 		connStr,

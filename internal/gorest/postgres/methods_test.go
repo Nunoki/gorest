@@ -12,6 +12,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/nunoki/gorest/internal/connstr"
 	"github.com/nunoki/gorest/internal/gorest"
 )
 
@@ -23,7 +24,8 @@ var (
 func TestMain(m *testing.M) {
 	migrationDir := "../../../.docker/postgres/*.up.sql"
 
-	connStr := ConnectionStringFromEnv()
+	dbU, dbPW, db, dbH, dbP, dbSSL := connstr.FromEnv()
+	connStr := ConnectionString(dbU, dbPW, db, dbH, dbP, dbSSL)
 	c, err := NewClient(ctx, connStr)
 	if err != nil {
 		log.Fatalln(err)
