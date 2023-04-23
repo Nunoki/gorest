@@ -5,11 +5,14 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 
 	"github.com/nunoki/gorest/internal/connstr"
 	"github.com/nunoki/gorest/internal/gorest"
 	"github.com/nunoki/gorest/internal/gorest/postgres"
 )
+
+const DefaultPayloadLimit = 5000 // bytes
 
 var (
 	ctx = context.Background()
@@ -29,7 +32,8 @@ func main() {
 	}()
 
 	port := getPort()
-	s := gorest.NewServer(pg, port)
+	plimit := getPayloadLimit()
+	s := gorest.NewServer(pg, port, plimit)
 	fmt.Println("Listening on port " + port)
 	log.Fatal(s.ListenAndServe())
 }
@@ -42,4 +46,15 @@ func getPort() string {
 		port = "80"
 	}
 	return port
+}
+
+func getPayloadLimit() int64 {
+	ls := os.Getenv("PAYLOAD_BYTE_LIMIT")
+	limit, err := strconv.Atoi(ls)
+
+	if err != nil {
+		limit = DefaultPayloadLimit
+	}
+
+	return int64(limit)
 }
