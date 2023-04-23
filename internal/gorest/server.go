@@ -1,6 +1,7 @@
 package gorest
 
 import (
+	"log"
 	"net/http"
 )
 
@@ -33,9 +34,11 @@ func NewServer(repo Repository, port string) *http.Server {
 		handleIndex(w, r)
 	})
 
+	handler := loggingMiddleware(mux)
+
 	server := &http.Server{
 		Addr:    ":" + port,
-		Handler: mux,
+		Handler: handler,
 	}
 
 	return server
@@ -43,6 +46,13 @@ func NewServer(repo Repository, port string) *http.Server {
 
 func handleIndex(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Hello world"))
+}
+
+func loggingMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("Received %s request for %s", r.Method, r.URL.Path)
+		next.ServeHTTP(w, r)
+	})
 }
 
 // // ServeHTTP just wraps Gin's ServeHTTP
