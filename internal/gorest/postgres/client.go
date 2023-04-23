@@ -4,13 +4,9 @@ import (
 	"context"
 	"fmt"
 	"net/url"
-	"os"
 
 	"github.com/jackc/pgx/v4/pgxpool"
 )
-
-const defaultPostgresPort = "5432"
-const defaultPostgresHost = "localhost"
 
 type Client struct {
 	conn *pgxpool.Pool
@@ -33,31 +29,6 @@ func (c *Client) Close() {
 		return
 	}
 	c.conn.Close()
-}
-
-// ConnectionStringFromEnv parses connection string from environment
-// and panics if required paramers are missing
-func ConnectionStringFromEnv() string {
-	u := os.Getenv("POSTGRES_USER")
-	pw := os.Getenv("POSTGRES_PASSWORD")
-	db := os.Getenv("POSTGRES_DB")
-	port := os.Getenv("POSTGRES_PORT")
-	host := os.Getenv("POSTGRES_HOST")
-	sslmode := os.Getenv("POSTGRES_SSLMODE")
-
-	if len(port) == 0 {
-		port = defaultPostgresPort
-	}
-
-	if len(host) == 0 {
-		host = defaultPostgresHost
-	}
-
-	if len(u) == 0 || len(pw) == 0 || len(db) == 0 {
-		panic("missing required parameter for database connection; required: POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB, optional: POSTGRES_HOST, POSTGRES_PORT")
-	}
-
-	return ConnectionString(u, pw, db, host, port, sslmode)
 }
 
 // ConnectionString returns the postgres connection string with parameters defined in the
