@@ -4,6 +4,7 @@ import (
 	"errors"
 	"io"
 	"net/http"
+	"strings"
 
 	"github.com/go-chi/render"
 )
@@ -63,6 +64,13 @@ func (h Handler) handleRead(w http.ResponseWriter, r *http.Request) {
 // The stored data will be associated with the authorized user.
 func (h Handler) handlePut(w http.ResponseWriter, r *http.Request) {
 	userID := userIDFromAuth(r)
+
+	contentType := r.Header.Get("Content-Type")
+	if !strings.EqualFold(contentType, "application/json") {
+		render.Status(r, http.StatusBadRequest)
+		render.JSON(w, r, "Request body must be of type application/json")
+		return
+	}
 	b, err := io.ReadAll(r.Body)
 
 	if err != nil {
