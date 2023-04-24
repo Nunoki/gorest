@@ -5,7 +5,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/gin-gonic/gin"
+	"github.com/go-chi/render"
 )
 
 var ErrInvalidJSON = errors.New("invalid JSON")
@@ -22,116 +22,95 @@ func NewHandler(repo Repository) Handler {
 	}
 }
 
-// Returns the user ID as set up by the middleware after successful token verification. If the user
-// ID variable has not been set up, it will panic.
-func userIDFromAuth(c *gin.Context) string {
-	userID, ok := c.Get("userID")
+// userIDFromAuth returns the user ID from this request's context.
+// If it couldn't be retreived, it panics.
+func userIDFromAuth(r *http.Request) string {
+	userID, ok := r.Context().Value(userID).(string)
 	if !ok {
 		panic("couldn't read user ID from auth middleware")
 	}
-	return userID.(string)
+	return userID
 }
 
-// HandleRead tries to read the stored blob for the authenticated user, and then outputs it
-// alongside some meta data in JSON format.
-func (h Handler) HandleRead(c *gin.Context) {
-	userID := userIDFromAuth(c)
+// handleRead tries to read and then output the stored blob for the authenticated user.
+// If there is nothing stored, it will respond with 204.
+func (h Handler) handleRead(w http.ResponseWriter, r *http.Request) {
+	userID := userIDFromAuth(r)
 	blob, modifiedAt, err := h.Repo.Find(userID)
 
 	if err == ErrNoRows {
-		c.AbortWithStatusJSON(
-			http.StatusNoContent,
-			"",
-		)
+		render.Status(r, http.StatusNoContent)
+		render.JSON(w, r, nil)
 		return
 	}
 
 	if err != nil {
-		c.AbortWithStatusJSON(
-			http.StatusInternalServerError,
-			err.Error(),
-		)
+		render.Status(r, http.StatusInternalServerError)
+		render.JSON(w, r, RespError{err.Error()})
 		return
 	}
 
-	c.JSON(
-		http.StatusOK,
-		Response{
-			Payload: string(blob),
-			Meta: ResponseMeta{
-				ModifiedAt: customTime{Time: modifiedAt},
-			},
+	resp := Response{
+		Payload: string(blob),
+		Meta: ResponseMeta{
+			ModifiedAt: customTime{Time: modifiedAt},
 		},
-	)
+	}
+	render.JSON(w, r, resp)
 }
 
-// HandleStore stores the posted blob and ties it to the authenticated user. The blob will be
-// validated by the repository implementation to be a valid JSON. It will output the number of bytes
-// written.
-func (h Handler) HandleStore(c *gin.Context) {
-	userID := userIDFromAuth(c)
-	b, err := io.ReadAll(c.Request.Body)
+// handlePut stores the posted data into the database.
+// The stored data will be associated with the authorized user.
+func (h Handler) handlePut(w http.ResponseWriter, r *http.Request) {
+	userID := userIDFromAuth(r)
+	b, err := io.ReadAll(r.Body)
 
 	if err != nil {
-		c.AbortWithStatusJSON(
-			http.StatusInternalServerError,
-			err,
-		)
+		render.Status(r, http.StatusInternalServerError)
+		render.JSON(w, r, RespError{err.Error()})
 		return
 	}
 
 	if len(b) == 0 {
-		c.AbortWithStatusJSON(
-			http.StatusBadRequest,
-			"Posted content is empty",
-		)
+		render.Status(r, http.StatusBadRequest)
+		render.JSON(w, r, RespError{"Posted content is empty"})
 		return
 	}
 
 	// JSON input is not being validated, because Postegres' JSON data type serves as the validator
 	if err := h.Repo.Update(userID, b); err != nil {
 		if err == ErrInvalidJSON {
-			c.AbortWithStatusJSON(
-				http.StatusBadRequest,
-				"Invalid JSON",
-			)
+			render.Status(r, http.StatusBadRequest)
+			render.JSON(w, r, RespError{"Invalid JSON"})
 			return
 		}
 
-		c.AbortWithStatusJSON(
-			http.StatusInternalServerError,
-			err.Error(),
-		)
+		render.Status(r, http.StatusInternalServerError)
+		render.JSON(w, r, RespError{err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, len(b))
+	render.JSON(w, r, len(b))
 }
 
-// HandleDelete will delete any data tied to the authenticated user. It will output the appropriate
-// messages depending on whether there was any data in there to begin with.
-func (h Handler) HandleDelete(c *gin.Context) {
-	userID := userIDFromAuth(c)
+// handleDelete will delete any stored data tied to the authenticated user
+// The response message will indicate if there was nothing to delete.
+// The response status will be 200 if something was deleted, or if it was already empty.
+func (h Handler) handleDelete(w http.ResponseWriter, r *http.Request) {
+	userID := userIDFromAuth(r)
 	err := h.Repo.Delete(userID)
 
 	if err == ErrNoRows {
-		c.AbortWithStatusJSON(
-			http.StatusOK,
-			"Nothing to delete",
-		)
+		render.JSON(w, r, "Nothing to delete")
 		return
 	}
 
 	if err != nil {
-		c.AbortWithStatusJSON(
-			http.StatusInternalServerError,
-			RespError{
-				Message: err.Error(),
-			},
-		)
+		render.Status(r, http.StatusInternalServerError)
+		render.JSON(w, r, RespError{err.Error()})
 		return
 	}
 
 	// if we got here, the user was deleted
-	c.JSON(http.StatusOK, "Deleted")
+	render.JSON(w, r, "Deleted")
 }

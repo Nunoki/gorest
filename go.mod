@@ -5,11 +5,13 @@ go 1.19
 require (
 	github.com/gin-gonic/gin v1.7.7
 	github.com/go-chi/chi/v5 v5.0.9-0.20230414014538-77d709fcde55
+	github.com/go-chi/render v1.0.2
 	github.com/golang-migrate/migrate/v4 v4.15.1
 	github.com/jackc/pgx/v4 v4.15.0
 )
 
 require (
+	github.com/ajg/form v1.5.1 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect

@@ -32,6 +32,14 @@ func NewServer(repo Repository, port string, byteLimit int64) *Server {
 		w.Write([]byte("Your user ID: " + r.Context().Value(userID).(string)))
 	})
 
+	h := NewHandler(repo)
+
+	rAuth.Route("/", func(r chi.Router) {
+		r.Get("/", h.handleRead)
+		r.Put("/", h.handlePut)
+		r.Delete("/", h.handleDelete)
+	})
+
 	return &Server{
 		router: r,
 	}
