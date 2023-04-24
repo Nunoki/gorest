@@ -15,7 +15,7 @@ func (t customTime) MarshalJSON() ([]byte, error) {
 	return []byte(t.Time.UTC().Format("\"2006-01-02T15:04:05Z\"")), nil
 }
 
-// New returns a new instance of the Handler with the repo as the user repository
+// NewHandler returns a new instance of the Handler with the repo as the user repository
 func NewHandler(repo Repository) Handler {
 	return Handler{
 		Repo: repo,
