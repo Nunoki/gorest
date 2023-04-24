@@ -1,8 +1,6 @@
 package gorest
 
 import (
-	"encoding/json"
-	"io/ioutil"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -15,32 +13,23 @@ type Server struct {
 
 // DOCME
 func NewServer(repo Repository, port string, byteLimit int64) *Server {
-	r := chi.NewRouter()
+	r := chi.NewRouter()     // no auth middleware
+	rAuth := chi.NewRouter() // with auth middleware
 
 	// NOTE: at the time of writing this, the RequestSize middleware results in a 500 error instead
 	// of 413
 	r.Use(middleware.RequestSize(byteLimit))
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
+	rAuth.Use(dummyAuthMiddleware())
+	r.Mount("/", rAuth)
 
 	r.Get("/ping", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("pong"))
+		w.Write([]byte("pong\n"))
 	})
 
-	r.Post("/post", func(w http.ResponseWriter, r *http.Request) {
-		data, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		type response struct {
-			Data string `json:"posted_data"`
-		}
-
-		w.Header().Set("Content-type", "application/json")
-		resp := response{string(data)}
-		json.NewEncoder(w).Encode(resp)
+	rAuth.Get("/user-id", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("Your user ID: " + r.Context().Value(userID).(string)))
 	})
 
 	return &Server{

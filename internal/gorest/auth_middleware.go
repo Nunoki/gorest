@@ -1,39 +1,33 @@
 package gorest
 
-// import (
-// 	"errors"
-// 	"net/http"
+import (
+	"context"
+	"fmt"
+	"net/http"
+)
 
-// 	"github.com/gin-gonic/gin"
-// )
+type ctxKey string
 
-// // AuthMiddleware will call the appropriate authorization method, and then call the subsequent
-// // handler call if the authorization was successful. If it wasn't, a StatusUnauthorized status
-// // code will be output, and execution terminated
-// func AuthMiddleware() gin.HandlerFunc {
-// 	return func(c *gin.Context) {
-// 		err := dummyAuth(c)
+const userID ctxKey = "userID"
 
-// 		if err != nil {
-// 			c.AbortWithStatusJSON(
-// 				http.StatusUnauthorized,
-// 				err.Error(),
-// 			)
-// 			return
-// 		}
-// 		c.Next()
-// 	}
-// }
+// dummyAuthMiddleware is a blueprint for implementing auth middlewares.
+// It requires a hardcoded value of "Bearer debug" in the Authorization header.
+// It then sets a valid UUID v4 in the context to serve as the user ID.
+// If the dummy bearer token is missing, it will write a 401 response.
+func dummyAuthMiddleware() func(next http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			authHeader := r.Header.Get("Authorization")
 
-// // dummyAuth is a debug/development authentication in which a dummy user id is being set, and
-// // authentication is marked as successful without doing any work
-// func dummyAuth(c *gin.Context) error {
-// 	authHeader := c.GetHeader("authorization")
+			if authHeader != "Bearer debug" {
+				w.WriteHeader(http.StatusUnauthorized)
+				fmt.Fprint(w, "Authorization needs header value of \"Bearer debug\"")
+				return
+			}
 
-// 	if authHeader != "Bearer debug" {
-// 		return errors.New("authentication failed, need bearer token of value \"debug\"")
-// 	}
+			ctx := context.WithValue(r.Context(), userID, "00000000-0000-0000-0000-000000000000")
 
-// 	c.Set("userID", "00000000-0000-0000-0000-000000000000")
-// 	return nil
-// }
+			next.ServeHTTP(w, r.WithContext(ctx))
+		})
+	}
+}
