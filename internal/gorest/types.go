@@ -16,7 +16,7 @@ type ResponseMeta struct {
 }
 
 type RespError struct {
-	Message string `json:"message"`
+	ErrorMessage string `json:"error_message"`
 }
 
 type customTime struct {
