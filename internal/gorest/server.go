@@ -1,22 +1,25 @@
 package gorest
 
 import (
+	"encoding/json"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
 
-const DefaultPayloadLimit = 1000 // #default_payload_limit
-
 type Server struct {
 	router *chi.Mux
 }
 
 // DOCME
-func NewServer(repo Repository, port string) *Server {
+func NewServer(repo Repository, port string, byteLimit int64) *Server {
 	r := chi.NewRouter()
 
+	// NOTE: at the time of writing this, the RequestSize middleware results in a 500 error instead
+	// of 413
+	r.Use(middleware.RequestSize(byteLimit))
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 
@@ -24,30 +27,28 @@ func NewServer(repo Repository, port string) *Server {
 		w.Write([]byte("pong"))
 	})
 
+	r.Post("/post", func(w http.ResponseWriter, r *http.Request) {
+		data, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		type response struct {
+			Data string `json:"posted_data"`
+		}
+
+		w.Header().Set("Content-type", "application/json")
+		resp := response{string(data)}
+		json.NewEncoder(w).Encode(resp)
+	})
+
 	return &Server{
 		router: r,
 	}
 }
 
-// DOCME
+// ServeHTTP satisfies the http.Handler interface
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.router.ServeHTTP(w, r)
 }
-
-// // Returns the byte limit for the payload, which should be passed as an environment variable
-// // PAYLOAD_BYTE_LIMIT; if it isn't, then a default limit of DefaultPayloadLimit will be returned
-// func getPayloadSizeLimit() int64 {
-// 	ls := os.Getenv("PAYLOAD_BYTE_LIMIT")
-// 	limit, err := strconv.Atoi(ls)
-// 	if err != nil || limit <= 0 {
-// 		limit = DefaultPayloadLimit
-// 		log.Printf(
-// 			"Payload limit set to default of %d bytes (use environment variable PAYLOAD_BYTE_LIMIT to override)",
-// 			limit,
-// 		)
-// 	} else {
-// 		log.Printf("Payload limit set to %d bytes", limit)
-// 	}
-
-// 	return int64(limit)
-// }
