@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-// acceptsJSON validates that the client accepts an application/json content-type response
+// acceptsJSON validates that the client accepts a JSON content-type response
 func acceptsJSON(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		accept := r.Header.Get("Accept")
