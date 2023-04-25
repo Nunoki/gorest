@@ -1,127 +1,251 @@
 package gorest
 
 import (
+	"context"
 	"errors"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 	"time"
-
-	"github.com/gin-gonic/gin"
 )
 
 const testUserID = "f44fe12d-8bec-4720-845e-dbebcc053f9e"
 
-func TestValidPutRequest(t *testing.T) {
-	gin.SetMode(gin.TestMode)
-	repo := &RepositoryMock{}
-	s := Server{
-		router: gin.New(),
+func TestPut(t *testing.T) {
+	req, err := http.NewRequest("PUT", "/", strings.NewReader("123"))
+	if err != nil {
+		t.Fatal(err)
 	}
+	req.Header.Add("Content-type", "application/json")
 
-	handler := NewHandler(repo)
-	s.router.PUT("/", func(c *gin.Context) {
-		c.Set("userID", testUserID)
-		handler.HandleStore(c)
-	})
+	ctx := context.WithValue(req.Context(), userID, testUserID)
+	req = req.WithContext(ctx)
 
-	repo.UpdateFunc = func(uid string, content []byte) error {
+	repoMock := &RepositoryMock{}
+	repoMock.UpdateFunc = func(uid string, content []byte) error {
 		return nil
 	}
-	w := httptest.NewRecorder()
-	r, _ := http.NewRequest("PUT", "/", strings.NewReader(`"hello world"`))
-	r.Header.Set("Content-type", "application/json")
-	s.ServeHTTP(w, r)
+	h := NewHandler(repoMock)
 
-	res := w.Result()
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(h.handlePut)
 
-	if res.StatusCode != 200 {
-		t.Fatalf("PUT request with valid JSON has failed with code %d", res.StatusCode)
+	handler.ServeHTTP(rr, req)
+
+	expCode := http.StatusOK
+	if rr.Code != expCode {
+		t.Errorf("expected status code %d but got %d", expCode, rr.Code)
+	}
+
+	expectedBody := "3\n"
+	if rr.Body.String() != expectedBody {
+		t.Errorf("expected body %q but got %q", expectedBody, rr.Body.String())
 	}
 }
 
-func TestPutRequestWithRepositoryErrorShouldFailWith500(t *testing.T) {
-	gin.SetMode(gin.TestMode)
-	repo := &RepositoryMock{}
-	s := Server{
-		router: gin.New(),
+func TestPutReturns500WhenRepositoryError(t *testing.T) {
+	req, err := http.NewRequest("PUT", "/", strings.NewReader("123"))
+	if err != nil {
+		t.Fatal(err)
 	}
+	req.Header.Add("Content-type", "application/json")
 
-	handler := NewHandler(repo)
-	s.router.PUT("/", func(c *gin.Context) {
-		c.Set("userID", testUserID)
-		handler.HandleStore(c)
-	})
+	ctx := context.WithValue(req.Context(), userID, testUserID)
+	req = req.WithContext(ctx)
 
-	repo.UpdateFunc = func(uid string, content []byte) error {
-		return errors.New("error")
+	repoMock := &RepositoryMock{}
+	repoMock.UpdateFunc = func(uid string, content []byte) error {
+		return errors.New("i failed")
 	}
-	w := httptest.NewRecorder()
-	r, _ := http.NewRequest("PUT", "/", strings.NewReader(`{"message":"Hello"}`))
-	r.Header.Set("Content-type", "application/json")
-	s.ServeHTTP(w, r)
+	h := NewHandler(repoMock)
 
-	res := w.Result()
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(h.handlePut)
 
-	if res.StatusCode != 500 {
-		t.Fatal("Repository error should result in 500 response, instead received", res.StatusCode)
-	}
-}
+	handler.ServeHTTP(rr, req)
 
-func TestSavingEmptyPayloadReturns400(t *testing.T) {
-	gin.SetMode(gin.TestMode)
-	s := Server{
-		router: gin.New(),
-	}
-
-	repo := &RepositoryMock{}
-	handler := NewHandler(repo)
-	s.router.PUT("/", func(c *gin.Context) {
-		c.Set("userID", testUserID)
-		handler.HandleStore(c)
-	})
-
-	w := httptest.NewRecorder()
-	r, _ := http.NewRequest("PUT", "/", strings.NewReader(""))
-	r.Header.Set("Content-type", "application/json")
-	s.ServeHTTP(w, r)
-
-	res := w.Result()
-
-	if res.StatusCode != 400 {
-		t.Fatalf("Empty payload should result in error 400, received %d instead", res.StatusCode)
+	expCode := http.StatusInternalServerError
+	if rr.Code != expCode {
+		t.Errorf("expected status code %d but got %d", expCode, rr.Code)
 	}
 }
 
-func TestReturnedDateFormat(t *testing.T) {
+func TestPutReturns400WhenSavingEmptyPayload(t *testing.T) {
+	req, err := http.NewRequest("PUT", "/", strings.NewReader(""))
+	if err != nil {
+		t.Fatal(err)
+	}
+	req.Header.Add("Content-type", "application/json")
+
+	ctx := context.WithValue(req.Context(), userID, testUserID)
+	req = req.WithContext(ctx)
+
+	repoMock := &RepositoryMock{}
+	h := NewHandler(repoMock)
+
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(h.handlePut)
+
+	handler.ServeHTTP(rr, req)
+
+	expCode := http.StatusBadRequest
+	if rr.Code != expCode {
+		t.Errorf("expected status code %d but got %d", expCode, rr.Code)
+	}
+}
+
+func TestGet(t *testing.T) {
 	time_, err := time.Parse("January 2, 15:04:05, 2006", "January 2, 15:04:05, 2006")
 	if err != nil {
 		t.Fatal("Failed to parse date")
 	}
 
-	gin.SetMode(gin.TestMode)
-	s := Server{
-		router: gin.New(),
+	req, err := http.NewRequest("GET", "/", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	req.Header.Add("Content-type", "application/json")
+
+	ctx := context.WithValue(req.Context(), userID, testUserID)
+	req = req.WithContext(ctx)
+
+	repoMock := &RepositoryMock{}
+	repoMock.FindFunc = func(string) ([]byte, time.Time, error) {
+		return []byte("hello world"), time_, nil
+	}
+	h := NewHandler(repoMock)
+
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(h.handleRead)
+
+	handler.ServeHTTP(rr, req)
+
+	expCode := http.StatusOK
+	if rr.Code != expCode {
+		t.Errorf("expected status code %d but got %d", expCode, rr.Code)
 	}
 
-	repo := &RepositoryMock{}
-	repo.FindFunc = func(string) ([]byte, time.Time, error) {
-		return []byte(""), time_, nil
+	exp := `{"payload":"hello world","meta":{"modifiedAt":"2006-01-02T15:04:05Z"}}` + "\n"
+	if rr.Body.String() != exp {
+		t.Fatalf("expected %q, received %q", exp, rr.Body.String())
 	}
-	handler := NewHandler(repo)
-	s.router.GET("/", func(c *gin.Context) {
-		c.Set("userID", testUserID)
-		handler.HandleRead(c)
-	})
+}
 
-	w := httptest.NewRecorder()
-	r, _ := http.NewRequest("GET", "/", strings.NewReader(""))
-	r.Header.Set("Content-type", "application/json")
-	s.ServeHTTP(w, r)
+func TestGetReturns204WhenNoContent(t *testing.T) {
+	time_, err := time.Parse("January 2, 15:04:05, 2006", "January 2, 15:04:05, 2006")
+	if err != nil {
+		t.Fatal("Failed to parse date")
+	}
 
-	exp := "2006-01-02T15:04:05Z"
-	if !strings.Contains(w.Body.String(), exp) {
-		t.Fatalf("Date format expected to be %q in response %q", exp, w.Body.String())
+	req, err := http.NewRequest("GET", "/", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	req.Header.Add("Content-type", "application/json")
+
+	ctx := context.WithValue(req.Context(), userID, testUserID)
+	req = req.WithContext(ctx)
+
+	repoMock := &RepositoryMock{}
+	repoMock.FindFunc = func(string) ([]byte, time.Time, error) {
+		return []byte(""), time_, ErrNoRows
+	}
+	h := NewHandler(repoMock)
+
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(h.handleRead)
+
+	handler.ServeHTTP(rr, req)
+
+	expCode := http.StatusNoContent
+	if rr.Code != expCode {
+		t.Errorf("expected status code %d but got %d", expCode, rr.Code)
+	}
+}
+
+func TestGetReturns500WhenRepositoryError(t *testing.T) {
+	req, err := http.NewRequest("GET", "/", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	req.Header.Add("Content-type", "application/json")
+
+	ctx := context.WithValue(req.Context(), userID, testUserID)
+	req = req.WithContext(ctx)
+
+	repoMock := &RepositoryMock{}
+	repoMock.FindFunc = func(string) ([]byte, time.Time, error) {
+		return []byte(""), time.Now(), errors.New("i failed")
+	}
+	h := NewHandler(repoMock)
+
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(h.handleRead)
+
+	handler.ServeHTTP(rr, req)
+
+	expCode := http.StatusInternalServerError
+	if rr.Code != expCode {
+		t.Errorf("expected status code %d but got %d", expCode, rr.Code)
+	}
+}
+
+func TestDelete(t *testing.T) {
+	req, err := http.NewRequest("DELETE", "/", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	req.Header.Add("Content-type", "application/json")
+
+	ctx := context.WithValue(req.Context(), userID, testUserID)
+	req = req.WithContext(ctx)
+
+	repoMock := &RepositoryMock{}
+	repoMock.DeleteFunc = func(s string) error {
+		return nil
+	}
+	h := NewHandler(repoMock)
+
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(h.handleDelete)
+
+	handler.ServeHTTP(rr, req)
+
+	expCode := http.StatusOK
+	if rr.Code != expCode {
+		t.Errorf("expected status code %d but got %d", expCode, rr.Code)
+	}
+
+	expectedBody := "\"Deleted\"\n"
+	if rr.Body.String() != expectedBody {
+		t.Errorf("expected body %q but got %q", expectedBody, rr.Body.String())
+	}
+}
+
+func TestDeleteReturns500WhenRepositoryError(t *testing.T) {
+	req, err := http.NewRequest("DELETE", "/", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	req.Header.Add("Content-type", "application/json")
+
+	ctx := context.WithValue(req.Context(), userID, testUserID)
+	req = req.WithContext(ctx)
+
+	repoMock := &RepositoryMock{}
+	repoMock.DeleteFunc = func(s string) error {
+		return errors.New("i failed")
+	}
+	h := NewHandler(repoMock)
+
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(h.handleDelete)
+
+	handler.ServeHTTP(rr, req)
+
+	expCode := http.StatusInternalServerError
+	if rr.Code != expCode {
+		t.Errorf("expected status code %d but got %d", expCode, rr.Code)
 	}
 }
