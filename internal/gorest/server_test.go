@@ -2,7 +2,7 @@ package gorest
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -76,7 +76,7 @@ func TestPayloadLimiter(t *testing.T) {
 		t.Fatalf("expected response code 500, received %d", rec.Result().StatusCode)
 	}
 
-	req.Body = ioutil.NopCloser(strings.NewReader(`12345`))
+	req.Body = io.NopCloser(strings.NewReader(`12345`))
 
 	rec = httptest.NewRecorder()
 	s.ServeHTTP(rec, req)
