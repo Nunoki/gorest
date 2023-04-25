@@ -21,6 +21,7 @@ func NewServer(repo Repository, port string, byteLimit int64) *Server {
 	r.Use(middleware.RequestSize(byteLimit))
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
+	r.Use(acceptsJSON)
 	rAuth.Use(dummyAuthMiddleware())
 	r.Mount("/", rAuth)
 
