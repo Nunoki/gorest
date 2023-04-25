@@ -34,7 +34,7 @@ func main() {
 
 	port := getPort()
 	plimit := getPayloadLimit()
-	s := gorest.NewServer(pg, port, plimit)
+	s := gorest.NewServer(pg, port, plimit, true)
 	fmt.Println("Listening on port " + port)
 	log.Fatal(http.ListenAndServe(":"+port, s))
 }

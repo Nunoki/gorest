@@ -12,14 +12,16 @@ type Server struct {
 }
 
 // DOCME
-func NewServer(repo Repository, port string, byteLimit int64) *Server {
+func NewServer(repo Repository, port string, byteLimit int64, withLogger bool) *Server {
 	r := chi.NewRouter()     // no auth middleware
 	rAuth := chi.NewRouter() // with auth middleware
 
 	// NOTE: at the time of writing this, the RequestSize middleware results in a 500 error instead
 	// of 413
 	r.Use(middleware.RequestSize(byteLimit))
-	r.Use(middleware.Logger)
+	if withLogger {
+		r.Use(middleware.Logger)
+	}
 	r.Use(middleware.Recoverer)
 	r.Use(acceptsJSON)
 	rAuth.Use(dummyAuthMiddleware())
