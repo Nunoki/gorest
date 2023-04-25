@@ -9,6 +9,10 @@ import (
 	"github.com/go-chi/render"
 )
 
+type Handler struct {
+	Repo Repository
+}
+
 var ErrInvalidJSON = errors.New("invalid JSON")
 
 // MarshalJSON marshals the time into the standard Atom time format
