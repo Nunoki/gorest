@@ -1,54 +1,61 @@
 package middleware
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/render"
 )
 
 func TestDummyAuthMiddlewareOK(t *testing.T) {
-	r := chi.NewRouter()
-	r.Use(DummyAuthMiddleware())
-
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		render.Status(r, http.StatusOK)
-		render.PlainText(w, r, "ok")
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprintf(w, "ok")
 	})
+	testServer := httptest.NewServer(DummyAuthMiddleware(handler))
+	defer testServer.Close()
 
-	resp := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "/", nil)
-	req.Header.Set("Authorization", "Bearer debug")
-	r.ServeHTTP(resp, req)
-
-	res := resp.Result()
-	if res.StatusCode != 200 {
-		t.Fatalf("expected code 200, received %d", res.StatusCode)
+	req, err := http.NewRequest("GET", testServer.URL, nil)
+	if err != nil {
+		t.Fatalf("Failed to create request: %v", err)
 	}
-	content, _ := io.ReadAll(res.Body)
+	req.Header.Add("Authorization", "Bearer debug")
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatalf("Failed to make request to test server: %v", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		t.Fatalf("expected code 200, received %d", resp.StatusCode)
+	}
+	content, _ := io.ReadAll(resp.Body)
 	if string(content) != "ok" {
 		t.Fatalf("expected body to equal \"ok\", received %s", string(content))
 	}
 }
 
 func TestDummyAuthMiddlewareForbidden(t *testing.T) {
-	r := chi.NewRouter()
-	r.Use(DummyAuthMiddleware())
-
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		render.Status(r, http.StatusOK)
-		render.PlainText(w, r, "ok")
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
 	})
+	testServer := httptest.NewServer(DummyAuthMiddleware(handler))
+	defer testServer.Close()
 
-	resp := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "/", nil)
-	r.ServeHTTP(resp, req)
+	req, err := http.NewRequest("GET", testServer.URL, nil)
+	if err != nil {
+		t.Fatalf("Failed to create request: %v", err)
+	}
 
-	res := resp.Result()
-	if res.StatusCode != 401 {
-		t.Fatalf("expected code 401, received %d", res.StatusCode)
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatalf("Failed to make request to test server: %v", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 401 {
+		t.Fatalf("expected code 401, received %d", resp.StatusCode)
 	}
 }

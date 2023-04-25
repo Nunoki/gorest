@@ -26,7 +26,7 @@ func NewServer(repo Repository, port string, byteLimit int64, withLogger bool) *
 	}
 	r.Use(middleware.Recoverer)
 	r.Use(customMiddleware.AcceptsJSON)
-	rAuth.Use(customMiddleware.DummyAuthMiddleware())
+	rAuth.Use(customMiddleware.DummyAuthMiddleware)
 	r.Mount("/", rAuth)
 
 	r.Get("/ping", func(w http.ResponseWriter, r *http.Request) {
