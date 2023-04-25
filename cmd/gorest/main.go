@@ -13,7 +13,7 @@ import (
 	"github.com/nunoki/gorest/internal/gorest/postgres"
 )
 
-const DefaultPayloadLimit = 5000 // bytes
+const DefaultPayloadLimit = 5000 // bytes #default_payload_limit
 
 var (
 	ctx = context.Background()
@@ -49,6 +49,8 @@ func getPort() string {
 	return port
 }
 
+// getPayloadLimit returns the payload limit set in the environment
+// If empty or negative, the default value will be returned.
 func getPayloadLimit() int64 {
 	ls := os.Getenv("PAYLOAD_BYTE_LIMIT")
 	limit, err := strconv.Atoi(ls)
