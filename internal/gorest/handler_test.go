@@ -8,6 +8,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/nunoki/gorest/internal/gorest/middleware"
 )
 
 const testUserID = "f44fe12d-8bec-4720-845e-dbebcc053f9e"
@@ -19,7 +21,7 @@ func TestPut(t *testing.T) {
 	}
 	req.Header.Add("Content-type", "application/json")
 
-	ctx := context.WithValue(req.Context(), userID, testUserID)
+	ctx := context.WithValue(req.Context(), middleware.UserID, testUserID)
 	req = req.WithContext(ctx)
 
 	repoMock := &RepositoryMock{}
@@ -51,7 +53,7 @@ func TestPutReturns500WhenRepositoryError(t *testing.T) {
 	}
 	req.Header.Add("Content-type", "application/json")
 
-	ctx := context.WithValue(req.Context(), userID, testUserID)
+	ctx := context.WithValue(req.Context(), middleware.UserID, testUserID)
 	req = req.WithContext(ctx)
 
 	repoMock := &RepositoryMock{}
@@ -78,7 +80,7 @@ func TestPutReturns400WhenSavingEmptyPayload(t *testing.T) {
 	}
 	req.Header.Add("Content-type", "application/json")
 
-	ctx := context.WithValue(req.Context(), userID, testUserID)
+	ctx := context.WithValue(req.Context(), middleware.UserID, testUserID)
 	req = req.WithContext(ctx)
 
 	repoMock := &RepositoryMock{}
@@ -107,7 +109,7 @@ func TestGet(t *testing.T) {
 	}
 	req.Header.Add("Content-type", "application/json")
 
-	ctx := context.WithValue(req.Context(), userID, testUserID)
+	ctx := context.WithValue(req.Context(), middleware.UserID, testUserID)
 	req = req.WithContext(ctx)
 
 	repoMock := &RepositoryMock{}
@@ -144,7 +146,7 @@ func TestGetReturns204WhenNoContent(t *testing.T) {
 	}
 	req.Header.Add("Content-type", "application/json")
 
-	ctx := context.WithValue(req.Context(), userID, testUserID)
+	ctx := context.WithValue(req.Context(), middleware.UserID, testUserID)
 	req = req.WithContext(ctx)
 
 	repoMock := &RepositoryMock{}
@@ -171,7 +173,7 @@ func TestGetReturns500WhenRepositoryError(t *testing.T) {
 	}
 	req.Header.Add("Content-type", "application/json")
 
-	ctx := context.WithValue(req.Context(), userID, testUserID)
+	ctx := context.WithValue(req.Context(), middleware.UserID, testUserID)
 	req = req.WithContext(ctx)
 
 	repoMock := &RepositoryMock{}
@@ -198,7 +200,7 @@ func TestDelete(t *testing.T) {
 	}
 	req.Header.Add("Content-type", "application/json")
 
-	ctx := context.WithValue(req.Context(), userID, testUserID)
+	ctx := context.WithValue(req.Context(), middleware.UserID, testUserID)
 	req = req.WithContext(ctx)
 
 	repoMock := &RepositoryMock{}
@@ -230,7 +232,7 @@ func TestDeleteReturns500WhenRepositoryError(t *testing.T) {
 	}
 	req.Header.Add("Content-type", "application/json")
 
-	ctx := context.WithValue(req.Context(), userID, testUserID)
+	ctx := context.WithValue(req.Context(), middleware.UserID, testUserID)
 	req = req.WithContext(ctx)
 
 	repoMock := &RepositoryMock{}

@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/go-chi/render"
+	"github.com/nunoki/gorest/internal/gorest/middleware"
 )
 
 type Handler struct {
@@ -30,7 +31,7 @@ func NewHandler(repo Repository) Handler {
 // userIDFromAuth returns the user ID from this request's context.
 // If it couldn't be retreived, it panics.
 func userIDFromAuth(r *http.Request) string {
-	userID, ok := r.Context().Value(userID).(string)
+	userID, ok := r.Context().Value(middleware.UserID).(string)
 	if !ok {
 		panic("couldn't read user ID from auth middleware")
 	}

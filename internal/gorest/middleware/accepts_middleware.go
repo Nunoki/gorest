@@ -1,4 +1,4 @@
-package gorest
+package middleware
 
 import (
 	"net/http"
@@ -6,7 +6,7 @@ import (
 )
 
 // acceptsJSON validates that the client accepts a JSON content-type response
-func acceptsJSON(next http.Handler) http.Handler {
+func AcceptsJSON(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		accept := r.Header.Get("Accept")
 		if !strings.Contains(accept, "application/json") && !strings.Contains(accept, "*/*") {

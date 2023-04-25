@@ -1,4 +1,4 @@
-package gorest
+package middleware
 
 import (
 	"net/http"
@@ -10,7 +10,7 @@ func TestAcceptMiddlewareSucceedsWithJSON(t *testing.T) {
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	})
-	testServer := httptest.NewServer(acceptsJSON(handler))
+	testServer := httptest.NewServer(AcceptsJSON(handler))
 	defer testServer.Close()
 
 	req, err := http.NewRequest("GET", testServer.URL, nil)
@@ -35,7 +35,7 @@ func TestAcceptMiddlewareSucceedsWithAsterisk(t *testing.T) {
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	})
-	testServer := httptest.NewServer(acceptsJSON(handler))
+	testServer := httptest.NewServer(AcceptsJSON(handler))
 	defer testServer.Close()
 
 	req, err := http.NewRequest("GET", testServer.URL, nil)
@@ -60,7 +60,7 @@ func TestAcceptMiddlewareFailsWhenNone(t *testing.T) {
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	})
-	testServer := httptest.NewServer(acceptsJSON(handler))
+	testServer := httptest.NewServer(AcceptsJSON(handler))
 	defer testServer.Close()
 
 	req, err := http.NewRequest("GET", testServer.URL, nil)

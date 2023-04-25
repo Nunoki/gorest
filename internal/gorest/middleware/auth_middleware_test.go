@@ -1,4 +1,4 @@
-package gorest
+package middleware
 
 import (
 	"io"
@@ -12,7 +12,7 @@ import (
 
 func TestDummyAuthMiddlewareOK(t *testing.T) {
 	r := chi.NewRouter()
-	r.Use(dummyAuthMiddleware())
+	r.Use(DummyAuthMiddleware())
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		render.Status(r, http.StatusOK)
@@ -36,7 +36,7 @@ func TestDummyAuthMiddlewareOK(t *testing.T) {
 
 func TestDummyAuthMiddlewareForbidden(t *testing.T) {
 	r := chi.NewRouter()
-	r.Use(dummyAuthMiddleware())
+	r.Use(DummyAuthMiddleware())
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		render.Status(r, http.StatusOK)

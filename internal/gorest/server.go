@@ -5,6 +5,8 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+
+	customMiddleware "github.com/nunoki/gorest/internal/gorest/middleware"
 )
 
 type Server struct {
@@ -23,8 +25,8 @@ func NewServer(repo Repository, port string, byteLimit int64, withLogger bool) *
 		r.Use(middleware.Logger)
 	}
 	r.Use(middleware.Recoverer)
-	r.Use(acceptsJSON)
-	rAuth.Use(dummyAuthMiddleware())
+	r.Use(customMiddleware.AcceptsJSON)
+	rAuth.Use(customMiddleware.DummyAuthMiddleware())
 	r.Mount("/", rAuth)
 
 	r.Get("/ping", func(w http.ResponseWriter, r *http.Request) {
@@ -32,7 +34,7 @@ func NewServer(repo Repository, port string, byteLimit int64, withLogger bool) *
 	})
 
 	rAuth.Get("/user-id", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Your user ID: " + r.Context().Value(userID).(string)))
+		w.Write([]byte("Your user ID: " + r.Context().Value(customMiddleware.UserID).(string)))
 	})
 
 	h := NewHandler(repo)
