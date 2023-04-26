@@ -1,3 +1,7 @@
+/*
+gorest connects to the database, and starts the HTTP server.
+It will read its configuration from the environment, or use sensible defaults.
+*/
 package main
 
 import (
@@ -20,14 +24,12 @@ var (
 )
 
 func main() {
-	// connect to database
 	dbU, dbPW, db, dbH, dbP, dbSSL := connstr.FromEnv()
 	connStr := postgres.ConnectionString(dbU, dbPW, db, dbH, dbP, dbSSL)
 	pg, err := postgres.NewClient(ctx, connStr)
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	defer func() {
 		pg.Close()
 	}()

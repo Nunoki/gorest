@@ -2,33 +2,29 @@
 
 ![Gopher logo](gopher.png)
 
-GoREST is a boilerplate REST API implemented in Go. 
+GoREST is a boilerplate REST API implemented in Go. It exposes some sample endpoints that can be used as a template for quickly developing a purpose-built API.
 
-It exposes 4 total endpoints, 3 of which are behind authentication middleware, 1 is public. The 1 public endpoint is a `/ping` endpoint, which only returns a `"pong"` in plain text. The other 3 are `GET`, `PUT` and `DELETE` endpoints for manipulating JSON-formatted data, which will be stored in the database corresponding to whatever user ID the authentication middleware resolves. 
+As of writing this, it contains the following features:
 
-In this boilerplate state, the bearer token requires a value of `debug` (as demonstrated in [Sample curl commands to use the service](#sample-curl-commands-to-use-the-service)), and the resolved user ID will be `00000000-0000-0000-0000-000000000000` (valid UUIDv4 format required by the user table).
+- Chi router for RESTful endpoints
+- Middleware
+- Public and authenticated endpoints
+- Custom data types
+- Postgres database using pgx
+- Database migrations
+- Commands for separate behavior
+- Unit and integration tests
+- Github workflow
+- Dockerization
+- Environment variables
+- Dev shell scripts
 
-# Development roadmap
-
-- [x] HTTP handlers
-- [x] Sample JSON endpoints
-- [x] Postgres database client
-- [x] Authentication middleware (+sample JWT code)
-- [x] Large payload protection middleware
-- [x] Dockerization 
-- [x] Database migrations
-- [x] Unit and integration Tests
-- [x] Github Actions CI
-- [ ] Listen on HTTPS
-- [ ] Swagger documentation
-- [ ] GRPC
-- [ ] GraphQL
-- [ ] Turn into Cookiecutter template
+In this boilerplate state, the bearer token requires a value of `debug` (demonstrated in [Sample curl commands to use the service](#sample-curl-commands-to-use-the-service)), and the resolved user ID will be `00000000-0000-0000-0000-000000000000` (valid UUIDv4 format required by the user table).
 
 # How to run
 
 > **Requirements:**
-> 
+>
 > - Docker Compose 1.27+, or Podman equivalent
 > - Set up values in the `.env` file using `.env.example` as template
 > - Go 1.18+ (if running [option 2](#option-2-for-local-development-using-go-toolchain))
@@ -42,19 +38,19 @@ In this boilerplate state, the bearer token requires a value of `debug` (as demo
 
 The following is accomplished through convenience scripts which run simple commands via `go` and `docker`/`podman`, but with environment variables prepared and passed to the running processes.
 
-1. Run `./scripts/database.sh`  
+1. Run `./scripts/database.sh`
  (gets only the database container up)
-2. Run `./scripts/migrate.sh`  
+2. Run `./scripts/migrate.sh`
  (only required if this is the first time you're creating the database container, or if you've made changes to the database; runs the database migrations)
-3. Run `./scripts/service-start.sh` (or `./scripts/air.sh` for live-reloading via [air](http://github.com/cosmtrek/air))  
+3. Run `./scripts/service-start.sh` (or `./scripts/air.sh` for live-reloading via [air](http://github.com/cosmtrek/air))
  (runs the app via `go run`)
 
 # Sample curl commands to use the service
 
-> **Note:**  
-> These commands assume you are running on port `1337` which is the default port set in `.env.example`. Otherwise, substitute the port number accordingly.
+> **Note:**
+> These commands are written for the out-of-the-box setup where the port is `1337`, and the required authentication token has the value of `debug`.
 
-To ping the service:
+To ping the service (public endpoint, no authentication):
 
     curl -i localhost:1337/ping
 

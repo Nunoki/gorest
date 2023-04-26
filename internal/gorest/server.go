@@ -13,7 +13,7 @@ type Server struct {
 	router *chi.Mux
 }
 
-// DOCME
+// NewServer returns a new instance of the server with registered handlers.
 func NewServer(repo Repository, port string, byteLimit int64, withLogger bool) *Server {
 	r := chi.NewRouter()     // no auth middleware
 	rAuth := chi.NewRouter() // with auth middleware
