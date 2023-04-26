@@ -1,3 +1,7 @@
+/*
+migrate will attempt to run all the migration scripts against the database.
+It will read the database configuration from the environment.
+*/
 package main
 
 import (

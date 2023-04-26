@@ -1,79 +1,56 @@
 package gorest
 
 import (
-	"log"
 	"net/http"
-	"os"
-	"strconv"
 
-	"github.com/gin-gonic/gin"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
+
+	customMiddleware "github.com/nunoki/gorest/internal/gorest/middleware"
 )
 
-const DefaultPayloadLimit = 1000 // #default_payload_limit
-
 type Server struct {
-	router *gin.Engine
+	router *chi.Mux
 }
 
-// NewServer returns an instantiation of a Server with the repository from repo, and the
-// AuthMiddleware attached, and sets up the route handlers
-func NewServer(repo Repository, ginLogger bool) *Server {
-	s := Server{
-		router: gin.New(),
+// NewServer returns a new instance of the server with registered handlers.
+func NewServer(repo Repository, port string, byteLimit int64, withLogger bool) *Server {
+	r := chi.NewRouter()     // no auth middleware
+	rAuth := chi.NewRouter() // with auth middleware
+
+	// NOTE: at the time of writing this, the RequestSize middleware results in a 500 error instead
+	// of 413
+	r.Use(middleware.RequestSize(byteLimit))
+	if withLogger {
+		r.Use(middleware.Logger)
 	}
+	r.Use(middleware.Recoverer)
+	r.Use(customMiddleware.AcceptsJSON)
+	rAuth.Use(customMiddleware.DummyAuthMiddleware)
+	r.Mount("/", rAuth)
 
-	if ginLogger {
-		s.router.Use(gin.Logger())
-	}
-
-	// limit payload size to prevent large payload attack
-	limit := getPayloadSizeLimit()
-	s.router.Use(SizeLimitMiddleware(limit))
-
-	handler := NewHandler(repo)
-
-	// create handler group, so that we can extract /ping as a public route
-	g := s.router.Group("")
-
-	// auth middleware before routes, order matters because it sets the user id in the context
-	g.Use(AuthMiddleware())
-	g.Use(ContentTypeMiddleware())
-
-	// business logic goes here
-	g.GET("/", handler.HandleRead)
-	g.PUT("/", handler.HandleStore)
-	g.DELETE("/", handler.HandleDelete)
-
-	// ping pong
-	s.router.GET("/ping", func(c *gin.Context) {
-		c.String(
-			http.StatusOK,
-			"pong\n",
-		)
+	r.Get("/ping", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("pong\n"))
 	})
 
-	return &s
+	rAuth.Get("/user-id", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("Your user ID: " + r.Context().Value(customMiddleware.UserID).(string)))
+	})
+
+	h := NewHandler(repo)
+
+	rAuth.Route("/", func(r chi.Router) {
+		r.Get("/", h.handleRead)
+		r.Put("/", h.handlePut)
+		r.Delete("/", h.handleDelete)
+	})
+
+	return &Server{
+		router: r,
+	}
 }
 
-// ServeHTTP just wraps Gin's ServeHTTP
+// ServeHTTP satisfies the http.Handler interface
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.router.ServeHTTP(w, r)
-}
-
-// Returns the byte limit for the payload, which should be passed as an environment variable
-// PAYLOAD_BYTE_LIMIT; if it isn't, then a default limit of DefaultPayloadLimit will be returned
-func getPayloadSizeLimit() int64 {
-	ls := os.Getenv("PAYLOAD_BYTE_LIMIT")
-	limit, err := strconv.Atoi(ls)
-	if err != nil || limit <= 0 {
-		limit = DefaultPayloadLimit
-		log.Printf(
-			"Payload limit set to default of %d bytes (use environment variable PAYLOAD_BYTE_LIMIT to override)",
-			limit,
-		)
-	} else {
-		log.Printf("Payload limit set to %d bytes", limit)
-	}
-
-	return int64(limit)
 }
