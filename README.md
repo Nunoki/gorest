@@ -1,6 +1,6 @@
 # GoREST
 
-![Gopher logo](gopher.png)
+![Gopher logo](gorest.jpg)
 
 GoREST is a boilerplate REST API implemented in Go. It exposes some sample endpoints that can be used as a template for quickly developing a purpose-built API.
 
